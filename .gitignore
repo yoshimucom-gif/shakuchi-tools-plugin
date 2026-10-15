@@ -1,0 +1,3 @@
+preview/
+*.pyc
+__pycache__/

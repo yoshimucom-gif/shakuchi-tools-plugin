@@ -1,0 +1,13 @@
+{
+  "name": "借地権の計算ツール",
+  "version": "1.0.0",
+  "download_url": "https://raw.githubusercontent.com/yoshimucom-gif/shakuchi-tools-plugin/main/shakuchi-tools.zip",
+  "requires": "5.8",
+  "tested": "6.7",
+  "requires_php": "7.4",
+  "author": "ミカタ株式会社",
+  "homepage": "https://github.com/yoshimucom-gif/shakuchi-tools-plugin",
+  "sections": {
+    "changelog": "1.0.0\n・借地権の売却相場・更新料・承諾料の3ツールを公開"
+  }
+}

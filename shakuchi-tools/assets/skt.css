@@ -1,0 +1,428 @@
+/* 借地権の計算ツール — 共通スタイル（書類デザイン）
+ *
+ * 方針:
+ *   角丸と影を使わず、罫線と余白で組む。査定書や契約書の質感に寄せる。
+ *   既製のUIキットそのままの見た目（丸いカード・柔らかい影・ピル型ラベル）を避ける。
+ *
+ * 色はサイトのテーマ設定（theme_mod diver_color_custom）に合わせている。
+ *   紺   #1F2E43 … ヘッダー帯・フッターと同じ濃色。合計行・選択中のタイル・フォーカス
+ *   真鍮 #BB9C5E … ヘッダーCTAと同じ差し色。ラベルの下線・番号・ボタン
+ * 枠線そのものは薄いグレー（#dfe3e8）。紺で囲うと強すぎる。
+ *
+ * すべて .skt 配下にスコープする。配色は :root ではなく .skt のインラインstyleで
+ * 上書きする（同一ページに複数ツールを置いても互いの色が壊れない）。
+ */
+
+.skt {
+  --skt-navy: #1F2E43;
+  --skt-navy-d: #16212f;
+  --skt-navy-l: #eef1f5;
+  --skt-brass: #BB9C5E;
+  --skt-brass-l: #f7f2e8;
+  --skt-ink: #17212e;
+  --skt-ink-2: #4a5663;
+  --skt-ink-3: #7b8794;
+  --skt-line: #dfe3e8;
+  --skt-line-2: #eef1f4;
+  --skt-rule: #c9d1d9;
+  --skt-bg: #ffffff;
+  --skt-bg-2: #fafbfc;
+  --skt-ok: #1f6b45;
+  --skt-ok-l: #eef6f1;
+  --skt-warn: #8a5a10;
+  --skt-warn-l: #fbf5e9;
+  --skt-ng: #a32620;
+  --skt-ng-l: #fbeeed;
+
+  box-sizing: border-box;
+  color: var(--skt-ink);
+  font-family: "Noto Sans JP", -apple-system, BlinkMacSystemFont, "Hiragino Sans",
+               "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
+  font-size: 16px;
+  line-height: 1.75;
+  -webkit-font-smoothing: antialiased;
+  margin: 2em 0;
+}
+.skt *, .skt *::before, .skt *::after { box-sizing: border-box; }
+.skt-head p, .skt-head h2, .skt-app p, .skt-app ul, .skt-app ol,
+.skt-app h2, .skt-app h3, .skt-app h4, .skt-app h5, .skt-cta p { margin: 0; }
+.skt button { font: inherit; color: inherit; }
+
+/* ---------- 見出し・導入 ---------- */
+.skt-head { margin-bottom: 16px; }
+.skt-eyebrow {
+  display: inline-block;
+  font-size: 11.5px; font-weight: 800; letter-spacing: .12em;
+  color: var(--skt-brass);
+  border-bottom: 2px solid var(--skt-brass);
+  padding-bottom: 2px; margin-bottom: 9px;
+}
+.skt-title { font-size: 22px; font-weight: 800; line-height: 1.45; letter-spacing: .01em; }
+.skt-lead { margin-top: 7px; color: var(--skt-ink-2); font-size: 14.5px; }
+
+/* ---------- レイアウト ---------- */
+.skt-app {
+  display: grid;
+  background: var(--skt-bg);
+  border: 1px solid var(--skt-line);
+  border-radius: 2px;
+}
+.skt-in { padding: 20px; border-bottom: 1px solid var(--skt-line); }
+.skt-out-wrap { padding: 20px; background: var(--skt-bg-2); }
+@media (min-width: 900px) {
+  .skt-app { grid-template-columns: minmax(0,1fr) 340px; }
+  .skt-in { border-bottom: 0; border-right: 1px solid var(--skt-line); padding: 24px; }
+  .skt-out-wrap { position: sticky; top: 0; align-self: start; padding: 24px; }
+}
+
+/* ---------- 入力 ---------- */
+.skt-group { border: 0; padding: 0; margin: 0 0 20px; }
+.skt-group:last-child { margin-bottom: 0; }
+.skt-group > legend {
+  padding: 0; margin: 0 0 13px; font-size: 12px; font-weight: 800;
+  color: var(--skt-ink-3); letter-spacing: .1em;
+  display: flex; align-items: center; gap: 10px; width: 100%;
+}
+.skt-group > legend::after { content: ""; flex: 1; height: 1px; background: var(--skt-line); }
+
+.skt-field { margin-bottom: 18px; }
+.skt-field:last-child { margin-bottom: 0; }
+.skt-label { display: block; font-size: 13.5px; font-weight: 700; margin-bottom: 7px; }
+.skt-label .skt-opt { font-weight: 400; color: var(--skt-ink-3); font-size: 12px; margin-left: 6px; }
+.skt-hint { font-size: 12.5px; color: var(--skt-ink-3); margin-top: 6px; line-height: 1.65; }
+
+/* 数値入力（単位は右の別枠。書類の記入欄に寄せる） */
+.skt-num { position: relative; display: flex; align-items: stretch; }
+.skt-num input {
+  width: 100%; min-width: 0; -moz-appearance: textfield;
+  font-size: 19px; font-weight: 700; font-variant-numeric: tabular-nums;
+  text-align: right; letter-spacing: .01em;
+  padding: 10px 60px 10px 13px;
+  border: 1px solid var(--skt-rule); border-radius: 2px;
+  background: var(--skt-bg); color: var(--skt-ink);
+  transition: border-color .12s, box-shadow .12s;
+}
+.skt-num input::-webkit-outer-spin-button,
+.skt-num input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.skt-num input:hover { border-color: #aab4be; }
+.skt-num input:focus { outline: 0; border-color: var(--skt-navy); box-shadow: inset 0 0 0 1px var(--skt-navy); }
+.skt-unit {
+  position: absolute; right: 1px; top: 1px; bottom: 1px;
+  display: flex; align-items: center; padding: 0 13px;
+  font-size: 12.5px; font-weight: 700; color: var(--skt-ink-2);
+  background: #f4f6f8; border-left: 1px solid var(--skt-line);
+  pointer-events: none;
+}
+
+/* スライダー */
+.skt-range { width: 100%; margin: 11px 0 2px; -webkit-appearance: none; appearance: none; background: transparent; }
+.skt-range::-webkit-slider-runnable-track { height: 3px; background: var(--skt-rule); }
+.skt-range::-moz-range-track { height: 3px; background: var(--skt-rule); }
+.skt-range::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 18px; height: 18px; margin-top: -7.5px;
+  border-radius: 0; background: var(--skt-navy); border: 0; cursor: pointer;
+}
+.skt-range::-moz-range-thumb {
+  width: 18px; height: 18px; border-radius: 0;
+  background: var(--skt-navy); border: 0; cursor: pointer;
+}
+.skt-range:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 3px var(--skt-navy-l); }
+.skt-scale { display: flex; justify-content: space-between; font-size: 11.5px; color: var(--skt-ink-3); font-variant-numeric: tabular-nums; }
+
+/* タイル選択（枠を共有した一枚の帯にする） */
+.skt-tiles {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
+  border: 1px solid var(--skt-rule); border-radius: 2px; overflow: hidden;
+}
+.skt-tiles.skt-t2 { grid-template-columns: repeat(2, 1fr); }
+.skt-tiles.skt-t1 { grid-template-columns: 1fr; }
+.skt-tile { position: relative; display: block; }
+.skt-tile input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.skt-tile > span {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 1px; min-height: 50px; padding: 8px 10px; text-align: center;
+  font-size: 13.5px; font-weight: 700; line-height: 1.35;
+  background: var(--skt-bg); cursor: pointer;
+  border-right: 1px solid var(--skt-line);
+  transition: background .12s, color .12s;
+}
+.skt-tile:last-child > span { border-right: 0; }
+.skt-tile > span small { font-size: 11px; font-weight: 500; color: var(--skt-ink-3); }
+.skt-tile:hover > span { background: #f4f6f8; }
+.skt-tile input:checked + span { background: var(--skt-navy); color: #fff; }
+.skt-tile input:checked + span small { color: rgba(255,255,255,.72); }
+.skt-tile input:focus-visible + span { outline: 2px solid var(--skt-navy); outline-offset: -2px; }
+
+/* チェック行 */
+.skt-checks { display: grid; gap: 0; border: 1px solid var(--skt-rule); border-radius: 2px; }
+.skt-check { position: relative; display: block; border-bottom: 1px solid var(--skt-line); }
+.skt-check:last-child { border-bottom: 0; }
+.skt-check input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.skt-check > span {
+  display: grid; grid-template-columns: 20px 1fr; gap: 11px; align-items: start;
+  padding: 11px 14px; background: var(--skt-bg); cursor: pointer;
+  font-size: 14px; line-height: 1.6;
+  transition: background .12s;
+}
+.skt-check > span::before {
+  content: ""; width: 19px; height: 19px; margin-top: 2px; border-radius: 1px;
+  border: 1px solid #a7b1bb; background-color: var(--skt-bg);
+  background-position: center; background-repeat: no-repeat; background-size: 13px;
+  transition: border-color .12s, background-color .12s;
+}
+.skt-check input:checked + span { background: var(--skt-navy-l); }
+.skt-check input:checked + span::before {
+  border-color: var(--skt-navy); background-color: var(--skt-navy);
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='white' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2.5 8.5l3.5 3.5 7.5-7.5'/%3E%3C/svg%3E");
+}
+.skt-check:hover > span { background: #f4f6f8; }
+.skt-check input:focus-visible + span { outline: 2px solid var(--skt-navy); outline-offset: -2px; }
+.skt-check em { display: block; font-style: normal; font-size: 12.5px; color: var(--skt-ink-3); margin-top: 2px; }
+
+/* 日付・セレクト */
+.skt-date input, .skt-sel select {
+  width: 100%; font-size: 15.5px; font-weight: 500; padding: 10px 13px;
+  border: 1px solid var(--skt-rule); border-radius: 2px;
+  background: var(--skt-bg); color: var(--skt-ink);
+}
+.skt-sel select {
+  appearance: none; -webkit-appearance: none; padding-right: 36px;
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%234a5663' stroke-width='1.8' stroke-linecap='round'%3E%3Cpath d='M4 6.5l4 4 4-4'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 12px center; background-size: 15px;
+}
+.skt-date input:focus, .skt-sel select:focus {
+  outline: 0; border-color: var(--skt-navy); box-shadow: inset 0 0 0 1px var(--skt-navy);
+}
+.skt-ym { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+/* 折りたたみ */
+.skt-more { margin-top: 16px; border-top: 1px solid var(--skt-line); padding-top: 14px; }
+.skt-more > summary {
+  cursor: pointer; font-size: 13.5px; font-weight: 700; color: var(--skt-navy);
+  list-style: none; display: inline-flex; align-items: center; gap: 7px;
+}
+.skt-more > summary::-webkit-details-marker { display: none; }
+.skt-more > summary::before {
+  content: ""; width: 12px; height: 12px; flex: none;
+  background-color: var(--skt-brass); transition: transform .18s;
+  -webkit-mask: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M5 2.5l6 5.5-6 5.5z'/%3E%3C/svg%3E") center/contain no-repeat;
+  mask: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M5 2.5l6 5.5-6 5.5z'/%3E%3C/svg%3E") center/contain no-repeat;
+}
+.skt-more[open] > summary::before { transform: rotate(90deg); }
+.skt-more > div { padding-top: 16px; }
+
+/* ---------- 結果 ---------- */
+.skt-out { background: transparent; }
+.skt-hl-label { font-size: 12px; font-weight: 700; color: var(--skt-ink-2); letter-spacing: .04em; }
+.skt-hl-val {
+  display: flex; align-items: baseline; gap: 2px; margin-top: 1px;
+  font-weight: 800; letter-spacing: -.025em; color: var(--skt-ink);
+  font-variant-numeric: tabular-nums;
+}
+.skt-hl-val b { font-size: clamp(30px, 7vw, 38px); line-height: 1.12; font-weight: 800; }
+.skt-hl-val i { font-style: normal; font-size: 16px; font-weight: 700; }
+.skt-hl-sub { font-size: 12px; color: var(--skt-ink-3); margin-top: 3px; }
+
+/* 内訳の帯 */
+.skt-bar { display: flex; height: 8px; margin: 16px 0 10px; background: var(--skt-line-2); }
+.skt-bar i { display: block; height: 100%; min-width: 2px; transition: width .3s ease; }
+.skt-legend { display: grid; gap: 4px; font-size: 12.5px; }
+.skt-legend div { display: flex; align-items: center; gap: 7px; color: var(--skt-ink-2); }
+.skt-legend b { width: 8px; height: 8px; flex: none; }
+.skt-legend span { margin-left: auto; font-weight: 700; color: var(--skt-ink); font-variant-numeric: tabular-nums; }
+
+/* 明細（伝票の行） */
+.skt-rows { margin-top: 16px; }
+.skt-row {
+  display: flex; align-items: baseline; gap: 10px; padding: 7px 0;
+  border-bottom: 1px dotted var(--skt-rule); font-size: 13.5px;
+}
+.skt-row > span:first-child { color: var(--skt-ink-2); }
+.skt-row > span:last-child { margin-left: auto; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.skt-row.is-minus > span:last-child { color: var(--skt-ng); }
+.skt-row.is-total {
+  border-bottom: 0; border-top: 2px solid var(--skt-navy); margin-top: 3px;
+  padding-top: 11px; font-size: 15px; font-weight: 800;
+}
+.skt-row.is-total > span:first-child { color: var(--skt-ink); }
+.skt-row.is-total > span:last-child { font-size: 17px; }
+.skt-row.is-sub { font-size: 12px; padding: 4px 0 4px 14px; border-bottom: 0; color: var(--skt-ink-3); }
+.skt-row.is-sub > span:last-child { font-weight: 500; color: var(--skt-ink-3); }
+
+/* 判定 */
+.skt-verdict { padding: 14px 16px; border: 1px solid; border-left-width: 4px; border-radius: 2px; }
+.skt-verdict.lv-ok { background: var(--skt-ok-l); border-color: #bcd9c8; border-left-color: var(--skt-ok); }
+.skt-verdict.lv-warn { background: var(--skt-warn-l); border-color: #e3cfa4; border-left-color: var(--skt-warn); }
+.skt-verdict.lv-ng { background: var(--skt-ng-l); border-color: #e6bcb9; border-left-color: var(--skt-ng); }
+.skt-verdict.lv-info { background: var(--skt-bg); border-color: var(--skt-line); border-left-color: var(--skt-navy); }
+.skt-verdict h4 { font-size: 16px; font-weight: 800; line-height: 1.5; }
+.skt-verdict.lv-ok h4 { color: var(--skt-ok); }
+.skt-verdict.lv-warn h4 { color: var(--skt-warn); }
+.skt-verdict.lv-ng h4 { color: var(--skt-ng); }
+.skt-verdict.lv-info h4 { color: var(--skt-ink); }
+.skt-verdict p { font-size: 13.5px; margin-top: 6px; color: var(--skt-ink-2); }
+.skt-score { display: flex; align-items: baseline; gap: 4px; font-variant-numeric: tabular-nums; margin-bottom: 4px; }
+.skt-score b { font-size: 32px; font-weight: 800; line-height: 1; }
+.skt-score i { font-style: normal; font-size: 13px; color: var(--skt-ink-3); }
+
+/* 指摘 */
+.skt-flags { display: grid; gap: 10px; margin-top: 16px; }
+.skt-flag {
+  display: grid; grid-template-columns: 16px 1fr; gap: 10px;
+  font-size: 13px; line-height: 1.7; color: var(--skt-ink-2);
+}
+.skt-flag::before { content: ""; width: 15px; height: 15px; margin-top: 4px; background-position: center; background-repeat: no-repeat; background-size: 11px; }
+.skt-flag.lv-ok::before { background-color: var(--skt-ok); background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='white' stroke-width='2.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2.5 8.5l3.5 3.5 7.5-7.5'/%3E%3C/svg%3E"); }
+.skt-flag.lv-warn::before { background-color: var(--skt-warn); background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='white'%3E%3Cpath d='M7 3h2v6H7zM7 11h2v2H7z'/%3E%3C/svg%3E"); }
+.skt-flag.lv-ng::before { background-color: var(--skt-ng); background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='white' stroke-width='2.8' stroke-linecap='round'%3E%3Cpath d='M4 4l8 8M12 4l-8 8'/%3E%3C/svg%3E"); }
+.skt-flag.lv-info::before { background-color: var(--skt-navy); background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='white'%3E%3Cpath d='M7 6h2v7H7zM7 3h2v2H7z'/%3E%3C/svg%3E"); }
+.skt-flag b { color: var(--skt-ink); font-weight: 800; }
+
+/* チェックリスト */
+.skt-list { margin-top: 14px; display: grid; gap: 18px; }
+.skt-list h5 {
+  font-size: 12px; font-weight: 800; color: var(--skt-ink); letter-spacing: .06em;
+  margin: 0 0 8px; padding-bottom: 5px; border-bottom: 2px solid var(--skt-brass);
+}
+.skt-list ul { list-style: none; padding: 0; display: grid; gap: 6px; }
+.skt-list li { display: grid; grid-template-columns: 16px 1fr; gap: 9px; font-size: 13.5px; line-height: 1.65; }
+.skt-list li::before { content: ""; width: 14px; height: 14px; margin-top: 5px; border: 1px solid #9aa4ae; background: var(--skt-bg); }
+.skt-list li em { display: block; font-style: normal; font-size: 12px; color: var(--skt-ink-3); }
+
+/* 早見表 */
+.skt-table { margin-top: 16px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.skt-table table { width: 100%; border-collapse: collapse; font-size: 13px; font-variant-numeric: tabular-nums; }
+.skt-table th, .skt-table td { padding: 7px 12px; text-align: right; border-bottom: 1px solid var(--skt-line); white-space: nowrap; }
+.skt-table th { background: #f4f6f8; font-weight: 700; color: var(--skt-ink-2); font-size: 12px; border-bottom: 1px solid var(--skt-rule); }
+.skt-table th:first-child, .skt-table td:first-child { text-align: left; }
+.skt-table tbody tr.is-hit { background: var(--skt-navy-l); }
+.skt-table tbody tr.is-hit td { font-weight: 800; color: var(--skt-navy); }
+
+/* 注記 */
+.skt-notes { margin-top: 16px; padding-top: 13px; border-top: 1px solid var(--skt-line); }
+.skt-notes ul { padding: 0; margin: 0; }
+.skt-notes li { font-size: 12px; color: var(--skt-ink-3); line-height: 1.7; margin-bottom: 5px; padding-left: 14px; position: relative; list-style: none; }
+.skt-notes li::before { content: "※"; position: absolute; left: 0; }
+
+/* 操作 */
+.skt-actions { display: flex; flex-wrap: wrap; gap: 0; margin-top: 18px; border: 1px solid var(--skt-rule); border-radius: 2px; }
+.skt-btn {
+  flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 9px 12px; font-size: 13px; font-weight: 700;
+  border: 0; border-right: 1px solid var(--skt-line);
+  background: var(--skt-bg); color: var(--skt-ink-2); cursor: pointer;
+  transition: background .12s, color .12s;
+}
+.skt-btn:last-child { border-right: 0; }
+.skt-btn:hover { background: #f4f6f8; color: var(--skt-navy); }
+.skt-btn:focus-visible { outline: 2px solid var(--skt-navy); outline-offset: -2px; }
+.skt-btn.is-done { background: var(--skt-ok-l); color: var(--skt-ok); }
+
+/* CTA（サイトのヘッダーCTAと同じ真鍮・角丸2px） */
+.skt-cta {
+  display: block; margin-top: 18px; padding: 14px 20px; text-align: center;
+  background: var(--skt-brass); color: #fff !important; text-decoration: none !important;
+  border-radius: 2px; font-weight: 800; font-size: 15px; line-height: 1.5;
+  transition: background .12s;
+}
+.skt-cta:hover { background: #a98a4d; }
+.skt-cta small { display: block; font-size: 12px; font-weight: 500; opacity: .9; margin-top: 3px; }
+
+/* 解説 */
+.skt-desc { margin-top: 28px; }
+
+.skt-desc ul { padding-left: 1.3em; margin-bottom: 11px; }
+.skt-desc li { margin-bottom: 5px; }
+.skt-desc strong { font-weight: 800; color: var(--skt-ink); }
+.skt-desc table { width: 100%; border-collapse: collapse; margin: 12px 0 16px; font-variant-numeric: tabular-nums; }
+.skt-desc th, .skt-desc td { padding: 9px 12px; border: 1px solid var(--skt-line); text-align: left; vertical-align: top; }
+.skt-desc thead th { background: #f4f6f8; font-weight: 700; }
+.skt-desc td + td, .skt-desc th + th { text-align: right; }
+.skt-src { margin-top: 18px; font-size: 12.5px; color: var(--skt-ink-3); }
+.skt-src a { color: var(--skt-ink-2); }
+
+/* ---------- ツール一覧（カード全体がボタン） ---------- */
+.skt-index { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); }
+.skt-index.is-cols-1 { grid-template-columns: 1fr; }
+@media (min-width: 620px) {
+  .skt-index.is-cols-2 { grid-template-columns: repeat(2, 1fr); }
+  .skt-index.is-cols-3 { grid-template-columns: repeat(3, 1fr); }
+}
+/* style="row" … 説明を出さず1行ずつ詰める。記事の途中やサイドバー向け */
+.skt-index.is-row { grid-template-columns: 1fr; gap: 0; border: 1px solid var(--skt-line); }
+.skt-index.is-row .skt-card {
+  border: 0; border-bottom: 1px solid var(--skt-line); padding: 12px 40px 12px 15px;
+}
+.skt-index.is-row .skt-card:last-child { border-bottom: 0; }
+.skt-index.is-row .skt-card b { font-size: 14.5px; margin-bottom: 0; }
+.skt-index.is-row .skt-card:hover { box-shadow: none; }
+.skt-card {
+  position: relative; display: block;
+  padding: 16px 40px 16px 18px;
+  text-decoration: none !important; color: inherit !important;
+  border: 1px solid var(--skt-line); border-radius: 2px; background: var(--skt-bg);
+  cursor: pointer; -webkit-tap-highlight-color: transparent;
+  transition: background .12s, border-color .12s, box-shadow .12s, transform .08s;
+}
+.skt-card::after {
+  content: ""; position: absolute; right: 16px; top: 50%; width: 9px; height: 9px;
+  margin-top: -5px; border-right: 2px solid var(--skt-brass); border-top: 2px solid var(--skt-brass);
+  transform: rotate(45deg); transition: transform .14s, border-color .12s;
+}
+.skt-card b { display: block; font-size: 15.5px; font-weight: 800; margin-bottom: 4px; }
+.skt-card span { font-size: 12.5px; color: var(--skt-ink-3); line-height: 1.65; }
+.skt-card:hover {
+  background: var(--skt-navy-l); border-color: var(--skt-navy);
+  box-shadow: inset 0 0 0 1px var(--skt-navy);
+}
+.skt-card:hover::after { transform: rotate(45deg) translate(2px, -2px); border-color: var(--skt-navy); }
+.skt-card:active { transform: translateY(1px); }
+.skt-card:focus-visible { outline: 2px solid var(--skt-navy); outline-offset: 2px; }
+
+/* noscript */
+.skt-noscript {
+  padding: 13px 16px; background: var(--skt-warn-l);
+  border: 1px solid #e3cfa4; border-left: 4px solid var(--skt-warn);
+  border-radius: 2px; font-size: 14px; color: var(--skt-warn);
+}
+
+/* 動きを減らす設定を尊重 */
+@media (prefers-reduced-motion: reduce) {
+  .skt *, .skt *::before, .skt *::after { transition: none !important; animation: none !important; }
+}
+
+/* 印刷 */
+@media print {
+  .skt-actions, .skt-cta, .skt-range, .skt-scale { display: none !important; }
+  .skt-app { grid-template-columns: 1fr !important; border-color: #999; page-break-inside: avoid; }
+  .skt-out-wrap { position: static !important; background: #fff; }
+  .skt-in { border-right: 0 !important; border-bottom: 1px solid #ccc; }
+  .skt-list li::before { border-color: #666; }
+}
+
+/* ---------- 借地権ツールで足したもの ---------- */
+
+/* 複数段に折り返すタイル。隙間1pxに罫の色を敷いて、段の境目にも線を出す */
+.skt-tiles.skt-t2, .skt-tiles.skt-t4 { gap: 1px; background: var(--skt-line); }
+.skt-tiles.skt-t2 .skt-tile > span, .skt-tiles.skt-t4 .skt-tile > span { border-right: 0; height: 100%; }
+.skt-tiles.skt-t4 { grid-template-columns: repeat(4, 1fr); }
+
+/* 土地の単価（取り方ごとの入力欄） */
+.skt-land-panel { margin-top: 12px; }
+.skt-sublabel { font-size: 12.5px; font-weight: 700; color: var(--skt-ink-2); margin: 10px 0 5px; }
+.skt-land-panel > .skt-sublabel:first-child { margin-top: 0; }
+.skt-land-status { font-size: 12.5px; color: var(--skt-ink-2); margin-top: 9px; line-height: 1.65; min-height: 1em; }
+.skt-land-status.is-warn { color: var(--skt-warn); }
+
+/* 結果の下の案内リンク */
+.skt-links { margin-top: 14px; display: grid; gap: 6px; }
+.skt-links a {
+  display: block; padding: 10px 34px 10px 13px; position: relative;
+  border: 1px solid var(--skt-line); background: var(--skt-bg);
+  font-size: 13.5px; font-weight: 700; color: var(--skt-navy) !important; text-decoration: none !important;
+}
+.skt-links a::after {
+  content: ""; position: absolute; right: 14px; top: 50%; width: 7px; height: 7px; margin-top: -4px;
+  border-right: 2px solid var(--skt-brass); border-top: 2px solid var(--skt-brass); transform: rotate(45deg);
+}
+.skt-links a:hover { background: var(--skt-navy-l); }
