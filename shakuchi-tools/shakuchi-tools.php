@@ -2,7 +2,7 @@
 /**
  * Plugin Name: 借地権の計算ツール
  * Description: 借地権の売却相場・更新料・承諾料の目安を、ショートコード1本でページに置けます。土地の単価は国交省「不動産情報ライブラリ」の土地の取引事例から自動で取得できます（APIキーを設定した場合）。計算はブラウザ内で行い、入力値は保存しません。
- * Version: 1.0.0
+ * Version: 1.0.1
  * Author: ミカタ株式会社
  * License: GPLv2 or later
  * Text Domain: shakuchi-tools
@@ -25,7 +25,7 @@
 
 if (!defined('ABSPATH')) exit;
 
-define('SKT_VER', '1.0.0');
+define('SKT_VER', '1.0.1');
 define('SKT_OPT', 'skt_options');
 define('SKT_DIR', plugin_dir_path(__FILE__));
 define('SKT_URL', plugin_dir_url(__FILE__));
@@ -73,13 +73,15 @@ function skt_opt($key = null) {
 
 /**
  * 国交省APIのキー。このプラグインの設定が空なら、同じサイトに入っている
- * 相場データプラグイン（fudosan-souba）のキーを使う。二重に入れなくて済むように。
+ * 借地権の目安査定（shakuchi-satei）・相場データ（fudosan-souba）のキーを使う。二重に入れなくて済むように。
  */
 function skt_api_key() {
     $k = trim((string) skt_opt('api_key'));
     if ($k !== '') return $k;
-    $fsb = get_option('fsb_options');
-    if (is_array($fsb) && !empty($fsb['api_key'])) return trim((string) $fsb['api_key']);
+    foreach (array('ssa_options', 'fsb_options') as $o) {
+        $v = get_option($o);
+        if (is_array($v) && !empty($v['api_key'])) return trim((string) $v['api_key']);
+    }
     return '';
 }
 
