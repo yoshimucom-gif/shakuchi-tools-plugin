@@ -1,6 +1,6 @@
 {
   "name": "借地権の計算ツール",
-  "version": "1.1.3",
+  "version": "1.1.4",
   "download_url": "https://raw.githubusercontent.com/yoshimucom-gif/shakuchi-tools-plugin/main/shakuchi-tools.zip",
   "requires": "5.8",
   "tested": "6.7",
@@ -8,6 +8,6 @@
   "author": "ミカタ株式会社",
   "homepage": "https://github.com/yoshimucom-gif/shakuchi-tools-plugin",
   "sections": {
-    "changelog": "1.1.3\n売却相場の売り方の質問をなくし3つの売り方をいつも並べる・金額を保証しない旨を結果の表の下に目立つ枠で表示"
+    "changelog": "1.1.4\n計算ツールの結果の下（相談ボタンの上）に監修者の一言を Re:Diver のボイス（吹き出し）で表示。設定画面で写真・名前・ツールごとの文言を変更可"
   }
 }

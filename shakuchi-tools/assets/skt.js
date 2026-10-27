@@ -640,6 +640,10 @@
 
     /* CTA（設定画面で入れたURLがあるときだけ）。
        押したら、入力した条件の要約を相談フォームへ引き継ぐ（値はURLに載せず sessionStorage で渡す） */
+    /* 監修者の一言（サーバーで出したボイス）は、結果の下・ボタンの上へ */
+    var voice = root.querySelector('[data-voice]');
+    if (voice) outWrap.appendChild(voice);
+
     var cta = root.querySelector('[data-cta]');
     if (cta) {
       outWrap.appendChild(cta);

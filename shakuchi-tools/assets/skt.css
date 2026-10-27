@@ -499,3 +499,14 @@
 .skt-caution::before { content: ""; position: absolute; left: 16px; top: 16px; width: 18px; height: 18px; border-radius: 50%; background-color: var(--skt-warn); background-position: center; background-repeat: no-repeat; background-size: 12px; background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='white'%3E%3Cpath d='M7 3h2v6H7zM7 11h2v2H7z'/%3E%3C/svg%3E"); }
 .skt-caution-t { margin: 0 0 4px; font-size: 15px; font-weight: 700; color: var(--skt-warn); line-height: 1.6; }
 .skt-caution-d { margin: 0; font-size: 13.5px; color: var(--skt-ink-2, #3d4650); line-height: 1.8; }
+
+/* 監修者の一言（Re:Diver のボイス）。結果の下・ボタンの上 */
+.skt-voice { margin-top: 20px; }
+.skt-voice .dbp-voice { margin: 0; }
+.skt-voice-name { display: block; margin-top: 4px; font-size: 11px; line-height: 1.4; text-align: center; color: var(--skt-ink-3); }
+/* Re:Diver でないサイトの簡易表示 */
+.skt-voice.is-plain .dbp-voice { display: flex; gap: 14px; align-items: flex-start; }
+.skt-voice.is-plain .dbp-voice-icon { flex: none; width: 64px; }
+.skt-voice.is-plain .dbp-voice-icon-img { width: 64px; height: 64px; border-radius: 50%; object-fit: cover; }
+.skt-voice.is-plain .dbp-voice-text { flex: 1; padding: 12px 16px; background: var(--skt-navy-l); border-radius: 8px; font-size: 14px; line-height: 1.8; }
+.skt-voice.is-plain .dbp-voice-text p { margin: 0; }

@@ -2,7 +2,7 @@
 /**
  * Plugin Name: 借地権の計算ツール
  * Description: 借地権の売却相場・更新料・承諾料の目安を、ショートコード1本でページに置けます。土地の単価は国交省「不動産情報ライブラリ」の土地の取引事例から自動で取得できます（APIキーを設定した場合）。計算はブラウザ内で行い、入力値は保存しません。
- * Version: 1.1.3
+ * Version: 1.1.4
  * Author: ミカタ株式会社
  * License: GPLv2 or later
  * Text Domain: shakuchi-tools
@@ -25,7 +25,7 @@
 
 if (!defined('ABSPATH')) exit;
 
-define('SKT_VER', '1.1.3');
+define('SKT_VER', '1.1.4');
 define('SKT_OPT', 'skt_options');
 define('SKT_DIR', plugin_dir_path(__FILE__));
 define('SKT_URL', plugin_dir_url(__FILE__));
@@ -56,6 +56,12 @@ function skt_defaults() {
         'cta_label'   => '正確な金額を無料で査定してもらう',
         'cta_note'    => '監修の宅地建物取引業者が査定します。入力した条件は相談フォームに引き継がれます',
         'temple_url'  => '',
+        /* 結果の下（ボタンの上）に出す監修者の一言。Re:Diver のボイス（dbp/voice）で出す。画像が空なら出さない */
+        'voice_img'   => '',
+        'voice_name'  => '',
+        'voice_baikyaku' => '借地は、地主や借地契約の内容によって売れる金額が大きく変わります。まずはこの目安を手元に置いて、どの売り方が合うかを一緒に整理しましょう。',
+        'voice_koushin'  => '更新料は、地主や借地契約の内容によって大きく変わります。まずは地主から示された額が、目安から大きく外れていないかを一緒に確かめましょう。',
+        'voice_shoudaku' => '承諾料は、地主や借地契約の内容によって大きく変わります。まずは地主に話を切り出す前に、伝える条件を一緒に整理しましょう。',
         'handoff'     => '1',
         'f_message'   => 'your-message',
         'f_youken'    => 'youken',
@@ -376,6 +382,27 @@ function skt_cta_html() {
 }
 
 /**
+ * 監修者の一言（結果の下・ボタンの上）。Re:Diver のボイスブロックの保存形をそのまま組み、do_blocks で描画する
+ * （ブロックとして描画するとテーマ側のボイスのCSSが読み込まれる）。Re:Diver でないサイトでは skt.css の簡易表示になる。
+ */
+function skt_voice_html($slug) {
+    $o = skt_opt();
+    $text = isset($o['voice_' . $slug]) ? trim((string) $o['voice_' . $slug]) : '';
+    if ($o['voice_img'] === '' || $text === '') return '';
+    $alt = $o['voice_name'] !== '' ? $o['voice_name'] : '';
+    $block = '<!-- wp:dbp/voice -->'
+        . '<div class="wp-block-dbp-voice is-voice-direction-left is-voice-layout-inline is-fit-content dbp-voice">'
+        . '<div class="dbp-voice-icon"><img class="dbp-voice-icon-img" src="' . esc_url($o['voice_img']) . '" width="" height="" alt="' . esc_attr($alt) . '"/>'
+        . ($o['voice_name'] !== '' ? '<span class="skt-voice-name">' . esc_html($o['voice_name']) . '</span>' : '')
+        . '</div>'
+        . '<div class="dbp-voice-text has-content-gap"><!-- wp:paragraph --><p>' . esc_html($text) . '</p><!-- /wp:paragraph --></div></div>'
+        . '<!-- /wp:dbp/voice -->';
+    $html = function_exists('do_blocks') ? do_blocks($block) : $block;
+    $rd = class_exists('WP_Block_Type_Registry') && WP_Block_Type_Registry::get_instance()->is_registered('dbp/voice');
+    return '<div class="skt-voice' . ($rd ? '' : ' is-plain') . '" data-voice="1">' . $html . '</div>';
+}
+
+/**
  * [shakuchi_tool name="baikyaku"]
  *   title="" … 見出しを差し替える
  *   desc="off" … 解説（サーバー出力）を出さない
@@ -409,7 +436,7 @@ function skt_shortcode_tool($atts) {
     $out .= '<noscript><div class="skt-noscript">この計算ツールはブラウザの中で動きます。ご利用にはJavaScriptを有効にしてください。</div></noscript>';
     $out .= '<div class="skt-app"></div>';
 
-    if ($a['cta'] !== 'off') $out .= skt_cta_html();
+    if ($a['cta'] !== 'off') $out .= skt_voice_html($slug) . skt_cta_html();
 
     if ($a['desc'] !== 'off') {
         $out .= '<div class="skt-desc">' . $t['desc'] . '</div>';
@@ -452,6 +479,11 @@ function skt_sanitize($in) {
     $o['cta_note']   = sanitize_text_field((string) ($in['cta_note'] ?? ''));
     $o['temple_url'] = esc_url_raw(trim((string) ($in['temple_url'] ?? '')));
     $o['handoff']    = !empty($in['handoff']) ? '1' : '';
+    $o['voice_img']  = esc_url_raw(trim((string) ($in['voice_img'] ?? '')));
+    $o['voice_name'] = sanitize_text_field((string) ($in['voice_name'] ?? ''));
+    foreach (array_keys(skt_tools()) as $slug) {
+        $o['voice_' . $slug] = sanitize_textarea_field((string) ($in['voice_' . $slug] ?? ($d['voice_' . $slug] ?? '')));
+    }
     foreach (array('f_message', 'f_youken', 'f_tera') as $k) {
         $o[$k] = preg_replace('/[^A-Za-z0-9_\-\[\]]/', '', (string) ($in[$k] ?? $d[$k]));
     }
@@ -542,6 +574,28 @@ function skt_settings_page() {
               <p class="description">地主に「お寺・神社」を選んだときの案内に出すリンクです。空なら出しません。</p>
             </td>
           </tr>
+        </table>
+
+        <h2>監修者の一言（結果の下・ボタンの上）</h2>
+        <table class="form-table" role="presentation">
+          <tr>
+            <th scope="row"><label for="skt-voice-img">顔写真のURL</label></th>
+            <td>
+              <input type="url" class="large-text" id="skt-voice-img" name="<?php echo SKT_OPT; ?>[voice_img]" value="<?php echo esc_attr($o['voice_img']); ?>">
+              <p class="description">メディアライブラリの画像のURLです。空にすると一言を出しません。Re:Diver のボイス（吹き出し）で表示します。</p>
+            </td>
+          </tr>
+          <tr>
+            <th scope="row"><label for="skt-voice-name">名前</label></th>
+            <td><input type="text" class="regular-text" id="skt-voice-name" name="<?php echo SKT_OPT; ?>[voice_name]" value="<?php echo esc_attr($o['voice_name']); ?>" placeholder="監修 加瀬健史">
+              <p class="description">写真の下に小さく出します。空なら出しません。</p></td>
+          </tr>
+          <?php foreach ($tools as $slug => $t) : ?>
+          <tr>
+            <th scope="row"><label for="skt-voice-<?php echo esc_attr($slug); ?>"><?php echo esc_html($t['title']); ?></label></th>
+            <td><textarea class="large-text" rows="3" id="skt-voice-<?php echo esc_attr($slug); ?>" name="<?php echo SKT_OPT; ?>[voice_<?php echo esc_attr($slug); ?>]"><?php echo esc_textarea($o['voice_' . $slug] ?? ''); ?></textarea></td>
+          </tr>
+          <?php endforeach; ?>
         </table>
 
         <h2>掛け率</h2>
