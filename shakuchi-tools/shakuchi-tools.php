@@ -2,7 +2,7 @@
 /**
  * Plugin Name: 借地権の計算ツール
  * Description: 借地権の売却相場・更新料・承諾料の目安を、ショートコード1本でページに置けます。土地の単価は国交省「不動産情報ライブラリ」の土地の取引事例から自動で取得できます（APIキーを設定した場合）。計算はブラウザ内で行い、入力値は保存しません。
- * Version: 1.1.5
+ * Version: 1.1.6
  * Author: ミカタ株式会社
  * License: GPLv2 or later
  * Text Domain: shakuchi-tools
@@ -25,7 +25,7 @@
 
 if (!defined('ABSPATH')) exit;
 
-define('SKT_VER', '1.1.5');
+define('SKT_VER', '1.1.6');
 define('SKT_OPT', 'skt_options');
 define('SKT_DIR', plugin_dir_path(__FILE__));
 define('SKT_URL', plugin_dir_url(__FILE__));
@@ -171,12 +171,28 @@ function skt_api_fetch($city, $year, $quarter) {
 }
 
 /**
- * 直近8四半期の「宅地(土地)」の取引だけを返す。
+ * 相場から外す取引。国交省データの「取引の事情等」（Remarks）に、価格が相場とずれる事情が書かれたもの。
+ * 実データ（2025年・目黒区・世田谷区・練馬区の土地688件）で出た値: 隣地の購入9件・関係者間取引3件・調停・競売等1件。
+ * 関係者間取引は20万円/㎡（世田谷区の中央値92万円/㎡）のように大きく外れる。
+ * 「私道を含む取引」は事情ではなく面積の数え方なので残す。複数の事情が「、」でつながることがあるため部分一致で見る。
+ */
+function skt_is_special_trade($rec) {
+    $rm = isset($rec['Remarks']) ? (string) $rec['Remarks'] : '';
+    if ($rm === '') return false;
+    foreach (array('関係者間取引', '隣地の購入', '調停・競売等', '瑕疵', '他の権利・負担付き', 'その他事情有り') as $w) {
+        if (strpos($rm, $w) !== false) return true;
+    }
+    return false;
+}
+
+/**
+ * 直近8四半期の「宅地(土地)」の取引だけを返す（特殊な事情の取引は除く）。
  * 戻り: array('ok'=>bool, 'rows'=>[...], 'from'=>'2024年1月', 'to'=>'2025年12月')
  */
 function skt_land_records($city) {
     $latest = intval(current_time('Y')) - 1;   // 前年の4Qから遡る（当年分は公開が遅れる）
-    $ck = 'skt_land_' . substr(md5(skt_api_key()), 0, 8) . '_' . $city . '_' . $latest;
+    // v2: 特殊な事情の取引を外すようにした（2026-10-27）。前の集計のキャッシュを使わないよう名前を変える
+    $ck = 'skt_land_v2_' . substr(md5(skt_api_key()), 0, 8) . '_' . $city . '_' . $latest;
     $cached = get_transient($ck);
     if (is_array($cached)) return $cached;
 
@@ -187,7 +203,7 @@ function skt_land_records($city) {
         if ($part === null) { $failed++; }
         else {
             foreach ($part as $r) {
-                if ((isset($r['Type']) ? $r['Type'] : '') === '宅地(土地)') {
+                if ((isset($r['Type']) ? $r['Type'] : '') === '宅地(土地)' && !skt_is_special_trade($r)) {
                     $rows[] = array(
                         'd' => trim(isset($r['DistrictName']) ? $r['DistrictName'] : ''),
                         'u' => skt_unit_price($r),
