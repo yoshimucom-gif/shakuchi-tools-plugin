@@ -368,7 +368,11 @@
     if (way === 'doji') return { price: mul(b.shak, 'doji') };
     var gross = mul(b.shak, 'third');
     var fee = mul(b.shak, 'jouto');
-    return { gross: gross, fee: fee, price: [Math.max(0, gross[0] - fee[1]), Math.max(0, gross[1] - fee[0])] };
+    /* 承諾料は、売る価格と同じ借地権価格に掛けて引く。下限の価格から上限の借地権価格の承諾料を引くと、
+       幅が実際より広がっていた（借地権割合「不明」で 9,150万→8,845万 のように下がりすぎた。2026-10-27） */
+    var t = RATES.third || [0, 0], j = RATES.jouto || [0, 0];
+    return { gross: gross, fee: fee,
+      price: [Math.max(0, b.shak[0] * (t[0] - j[1])), Math.max(0, b.shak[1] * (t[1] - j[0]))] };
   }
 
   T.baikyaku = {
