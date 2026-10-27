@@ -99,7 +99,10 @@
   }
 
   function getJSON(path) {
-    return fetch((CFG.rest || '/wp-json/skt/v1/') + path, { credentials: 'same-origin' })
+    // パーマリンクが ?p= 形式のサイトでは rest_url が「…?rest_route=/skt/v1/」になる。そこへ「cities?pref=」を足すと
+    // ?が2つになって404になる（ステージングで「読み込めませんでした」になっていた）。2つ目の?は&にする
+    var base = CFG.rest || '/wp-json/skt/v1/';
+    return fetch(base + (base.indexOf('?') >= 0 ? path.replace('?', '&') : path), { credentials: 'same-origin' })
       .then(function (r) { return r.json(); });
   }
 
