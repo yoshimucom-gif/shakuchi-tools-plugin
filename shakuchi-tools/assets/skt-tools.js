@@ -319,9 +319,17 @@
   }
 
   function commonNotes(b) {
-    var n = ['参考価格の目安です。不動産鑑定評価や、宅地建物取引業者による価格査定ではありません。'];
+    var n = [];
     if (b && b.land && b.land.note) n.push(b.land.note);
     return n;
+  }
+
+  /* 結果の表のすぐ下に、目立つ枠で出す注意（2026-10-27 吉村さん「もう少し目立たせたい。売却価格を保証してるわけではないことも」）。
+     注釈（※）の列に混ぜると読まれないため、ここだけ別の枠にする */
+  function caution(what, decide) {
+    return { title: 'この金額は' + what + 'を保証するものではありません',
+      text: '公的な取引データから出した参考価格の目安で、不動産鑑定評価や、宅地建物取引業者による価格査定ではありません。実際の' +
+        what + 'は、' + decide + 'で変わります。' };
   }
 
   function landFlags(b) {
@@ -376,13 +384,8 @@
         { k: 'jinushi', t: 'tiles', label: '地主', q: '借地の地主はどなたですか？', def: 'tera', opts: [
           { v: 'tera', l: 'お寺・神社' }, { v: 'kojin', l: '個人' }, { v: 'hojin', l: '会社' }
         ] }
-      ] },
-      { title: '売り方', fields: [
-        { k: 'way', t: 'tiles', q: 'どの売り方の目安を見ますか？', def: 'all', cols: 2, opts: [
-          { v: 'all', l: '3つを比べる' }, { v: 'jinushi', l: '地主に売る' },
-          { v: 'third', l: '第三者に売る' }, { v: 'doji', l: '底地と一緒に売る' }
-        ] }
       ] }
+      /* 売り方は聞かずに、結果でいつも3つを並べる（2026-10-27 吉村さん「3つを比べるになる人がおおそう」） */
     ],
     compute: function (v) {
       var b = base(v);
@@ -392,37 +395,19 @@
         return {
           verdict: { level: 'info', title: '定期借地権は、残りの期間で価格が大きく変わります',
             desc: '期限が来ると更地にして返す契約のため、残りの年数が短いほど価格は下がります。この計算は旧法と普通借地権を前提にしているので、定期借地権は個別に査定を受けてください。' },
+          caution: caution('売却価格', '借地契約の内容や建物の状態、地主との話し合い'),
           notes: commonNotes(b)
         };
       }
 
-      var r = { flags: landFlags(b), notes: commonNotes(b) };
+      var r = { flags: landFlags(b), caution: caution('売却価格', '借地契約の内容や建物の状態、地主との話し合い'), notes: commonNotes(b) };
 
-      if (v.way === 'all') {
-        r.headline = { label: '借地権価格（売り方を比べる基準）', value: rng(b.shak),
-          sub: '更地価格 ' + rng(b.sar) + ' × 借地権割合' };
-        var rows = ['jinushi', 'third', 'doji'].map(function (w) {
-          return [WAYS[w], rng(wayRange(w, b).price)];
-        });
-        r.table = { head: ['売り方', '売却価格の目安'], rows: rows };
-      } else {
-        var wr = wayRange(v.way, b);
-        r.headline = { label: WAYS[v.way] + 'ときの売却価格の目安', value: rng(wr.price) };
-        r.rows = [
-          { label: '更地価格', value: rng(b.sar) },
-          { label: '借地権価格（借地権割合を掛けた額）', value: rng(b.shak) }
-        ];
-        if (v.way === 'third') {
-          r.rows.push({ label: '第三者への売却価格（借地権価格の' + pctRange('third') + '）', value: rng(wr.gross) });
-          r.rows.push({ label: '地主に払う譲渡承諾料（借地権価格の' + pctRange('jouto') + '）', value: '−' + rng(wr.fee), kind: 'minus' });
-        } else if (v.way === 'jinushi') {
-          r.rows.push({ label: '地主への売却（借地権価格の' + pctRange('jinushi') + '）', value: rng(wr.price) });
-        } else {
-          r.rows.push({ label: '借地人の取り分（借地権価格の' + pctRange('doji') + '）', value: rng(wr.price) });
-        }
-        r.rows.push({ label: '売却価格の目安', value: rng(wr.price), kind: 'total' });
-      }
-
+      r.headline = { label: '借地権価格（売り方を比べる基準）', value: rng(b.shak),
+        sub: '更地価格 ' + rng(b.sar) + ' × 借地権割合' };
+      var rows = ['jinushi', 'third', 'doji'].map(function (w) {
+        return [WAYS[w], rng(wayRange(w, b).price)];
+      });
+      r.table = { head: ['売り方', '売却価格の目安'], rows: rows };
       r.notes.push('掛け率：地主に売る＝借地権価格の' + pctRange('jinushi') + '、第三者に売る＝借地権価格の' +
         pctRange('third') + 'から譲渡承諾料（' + pctRange('jouto') + '）を引いた額、底地と一緒に売る＝借地権価格の' + pctRange('doji') + '。');
       r.notes.push('建物の価値は含めていません。仲介手数料や税金を引く前の金額です。');
@@ -430,10 +415,8 @@
       if (v.jinushi === 'tera') {
         r.flags.push({ level: 'info', title: '地主がお寺の場合',
           text: '承諾や売買の判断は住職ひとりではなく、規則に別の定めがなければ責任役員の過半数で決めます（宗教法人法19条）。回答までの期間に余裕を見てください。' });
-        if (v.way === 'all' || v.way === 'doji') {
-          r.flags.push({ level: 'info', title: '底地と一緒に売るとき',
-            text: 'お寺が底地を手放すには、少なくとも1か月前に信者などへ公告する手続きが必要です（宗教法人法23条）。' });
-        }
+        r.flags.push({ level: 'info', title: '底地と一緒に売るとき',
+          text: 'お寺が底地を手放すには、少なくとも1か月前に信者などへ公告する手続きが必要です（宗教法人法23条）。' });
         r.links = templeLinks();
       }
       if (v.kind === 'kyu') {
@@ -447,7 +430,6 @@
       var lines = landLines(v, b);
       lines.push('借地の種類：' + (KIND[v.kind] || ''));
       lines.push('地主：' + (JINUSHI[v.jinushi] || ''));
-      lines.push('売り方：' + (v.way === 'all' ? '比べたい' : WAYS[v.way]));
       if (r.headline) lines.push(r.headline.label + '：' + r.headline.value);
       if (r.table) r.table.rows.forEach(function (x) { lines.push('　' + x[0] + '：' + x[1]); });
       return { youken: '借地権の売却価格査定', lines: lines };
@@ -483,6 +465,7 @@
           { label: '借地権価格の' + pctRange('k_shakuchi') + 'で見た場合', value: rng(c) }
         ],
         flags: landFlags(b),
+        caution: caution('更新料の額', '借地契約書の取り決めや地主との話し合い'),
         notes: commonNotes(b)
       };
       if (v.tokuyaku === 'no') {
@@ -539,6 +522,7 @@
         ],
         flags: landFlags(b).concat([{ level: 'info', title: '地主が承諾しないとき',
           text: '裁判所に、地主の承諾に代わる許可を求める手続きがあります（' + s.law + '）。その場合も、許可と引き換えに承諾料に当たる金額の支払いを命じられるのが通常です。' }]),
+        caution: caution('承諾料の額', '地主との話し合い'),
         notes: commonNotes(b)
       };
     },

@@ -410,6 +410,13 @@
       out.appendChild(tw);
     }
 
+    if (r.caution) {
+      var cw = el('div', 'skt-caution');
+      cw.appendChild(el('p', 'skt-caution-t', r.caution.title));
+      cw.appendChild(el('p', 'skt-caution-d', r.caution.text));
+      out.appendChild(cw);
+    }
+
     if (r.links && r.links.length) {
       var lk = el('div', 'skt-links');
       r.links.forEach(function (x) {
@@ -441,6 +448,7 @@
       out.push('【' + g.group + '】');
       g.items.forEach(function (it) { out.push('□ ' + it.label + (it.note ? '（' + it.note + '）' : '')); });
     });
+    if (r.caution) out.push('※ ' + r.caution.title + '。' + r.caution.text);
     (r.notes || []).forEach(function (s) { out.push('※ ' + s); });
     return out.filter(Boolean);
   }
