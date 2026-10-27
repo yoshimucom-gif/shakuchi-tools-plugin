@@ -116,9 +116,9 @@
 
       /* 取り方のタイル */
       var modes = [];
-      if (CFG.api) modes.push(['auto', '住所から自動', '国の取引データ']);
-      modes.push(['rosen', '路線価を入れる', '千円/㎡']);
-      modes.push(['tsubo', '坪単価を入れる', '万円/坪']);
+      if (CFG.api) modes.push(['auto', '住所から', '自動で取得']);
+      modes.push(['rosen', '路線価', '千円/㎡で入力']);
+      modes.push(['tsubo', '坪単価', '万円/坪で入力']);
       var tiles = el('div', 'skt-tiles');
       tiles.setAttribute('role', 'radiogroup');
       tiles.setAttribute('aria-labelledby', id + '-lab');
@@ -161,7 +161,7 @@
       var rosen = numInput('千円/㎡', '例：350', onChange);
       pRosen.appendChild(rosen.wrap);
       pRosen.appendChild(el('div', 'skt-hint',
-        '路線価図で、土地が面した道路に書かれた数字です。「350C」なら350（千円/㎡）を入れ、後ろのアルファベットCは下の「借地権割合」で選んでください。'));
+        '路線価図で、土地が面した道路に書かれた数字です。「350C」なら350（千円/㎡）を入れ、後ろのアルファベットCは次の「借地権割合」で選んでください。'));
       wrap.appendChild(pRosen);
 
       /* 坪単価 */

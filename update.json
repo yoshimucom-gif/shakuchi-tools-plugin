@@ -1,6 +1,6 @@
 {
   "name": "借地権の計算ツール",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "download_url": "https://raw.githubusercontent.com/yoshimucom-gif/shakuchi-tools-plugin/main/shakuchi-tools.zip",
   "requires": "5.8",
   "tested": "6.7",
@@ -8,6 +8,6 @@
   "author": "ミカタ株式会社",
   "homepage": "https://github.com/yoshimucom-gif/shakuchi-tools-plugin",
   "sections": {
-    "changelog": "1.1.0\n・計算ツールを1画面1問のステップ式に変更（進み具合のバー・選ぶだけの質問は選んだら次へ・Enterで次へ・最後に結果だけを大きく表示・「条件を変える」で最初に戻る）\n・文字を大きく、色を濃く、線をはっきりさせた（見づらい・ぼんやりしているとの指摘）\n・「地主がお寺の場合」の根拠を宗教法人法19条（規則に別の定めがなければ責任役員の過半数）に訂正（18条と書いていた）"
+    "changelog": "1.1.1\n・入力欄の単位の枠が右端に重なり、入力例（例：350）が隠れていたのを修正（単位を入力欄の横に並べる）\n・ステップの台紙を薄い色にし、入力欄と選択肢を白で浮かせた（全部が白で区切りが見えなかった）\n・土地の単価の取り方の選択肢を短くし、選択肢の高さと区切り線をそろえた"
   }
 }

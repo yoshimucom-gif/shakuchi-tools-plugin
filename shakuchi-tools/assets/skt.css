@@ -474,3 +474,22 @@
 @media (prefers-reduced-motion: reduce) { .skt-step { animation: none; } .skt-progress-bar { transition: none; } }
 .skt-step .skt-tile > span { border-bottom: 1px solid var(--skt-line); }
 .skt-step .skt-field[data-key="land"] > .skt-tiles .skt-tile > span { font-size: 15px; padding: 12px 6px; }
+
+/* 2026-10-27 修正：単位の枠が入力欄の右端に重なって「例：350」が隠れていた（単位の幅78px＞入力欄の右余白60px）。
+   単位を重ねず、入力欄の横に並べる。単位の文字の長さが変わっても重ならない */
+.skt-num { display: flex; align-items: stretch; }
+.skt-num input { flex: 1 1 auto; padding-right: 13px !important; border-top-right-radius: 0; border-bottom-right-radius: 0; }
+.skt-num .skt-unit { position: static; flex: 0 0 auto; border: 1px solid var(--skt-rule); border-left: 0; border-radius: 0 2px 2px 0; }
+.skt-step .skt-num .skt-unit { border-color: #98a3ae; background: var(--skt-line-2); }
+.skt-num input::placeholder { color: #8a95a1; opacity: 1; }
+
+/* 2026-10-27 修正：台紙・入力欄・選択肢がすべて白で区切りが見えなかった。台紙を薄い色にし、入力欄と選択肢は白のまま浮かせる */
+.skt-app.is-wizard .skt-in { background: var(--skt-navy-l); }
+.skt-step .skt-tiles { background: #fff; }
+.skt-step .skt-tile > span { background: #fff; }
+.skt-step .skt-sel select, .skt-step .skt-num input { background: #fff; }
+.skt-app.is-wizard .skt-out-wrap { background: #fff; }
+/* 選択肢の区切り線は、すき間（1px）で描く。行が増えても高さがそろい、線が二重にならない */
+.skt-step .skt-tiles { gap: 1px; background: #98a3ae; }
+.skt-step .skt-tile { display: flex; }
+.skt-step .skt-tile > span { flex: 1; border: 0 !important; }
