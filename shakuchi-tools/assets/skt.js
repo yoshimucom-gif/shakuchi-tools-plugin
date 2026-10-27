@@ -515,35 +515,95 @@
       renderResult(out, r);
     }
 
+    /* ---------- 1画面1問のステップ式（2026-10-27） ----------
+       欄を1つずつ出し、最後に結果だけを大きく見せる。選ぶだけの欄は選んだら次へ進む。
+       条件付きの欄（when）は、そのとき出ていなければ飛ばす。 */
+    var steps = [];
     groups.forEach(function (g) {
-      var fs = el('fieldset', 'skt-group');
-      if (g.title) {
-        var lg = document.createElement('legend');
-        lg.textContent = g.title;
-        fs.appendChild(lg);
-      }
-      var host = fs;
-      if (g.fold) {
-        var det = el('details', 'skt-more');
-        var sm = document.createElement('summary');
-        sm.textContent = g.title || '詳しい条件を入れる';
-        det.appendChild(sm);
-        var inner = el('div');
-        det.appendChild(inner);
-        fs = el('fieldset', 'skt-group');
-        fs.appendChild(det);
-        host = inner;
-      }
       (g.fields || []).forEach(function (f) {
         var w = buildField(f, uid, recompute);
-        host.appendChild(w);
         fields.push({ f: f, wrap: w });
+        var st = el('div', 'skt-step');
+        st.hidden = true;
+        st.appendChild(el('h3', 'skt-q', f.q || f.label || g.title || ''));
+        st.appendChild(w);
+        var err = el('p', 'skt-step-err'); err.hidden = true; err.setAttribute('role', 'alert');
+        st.appendChild(err);
+        var nav = el('div', 'skt-step-nav');
+        var back = el('button', 'skt-btn skt-back', '戻る'); back.type = 'button';
+        var next = el('button', 'skt-btn skt-next', '次へ'); next.type = 'button';
+        nav.appendChild(back); nav.appendChild(next);
+        st.appendChild(nav);
+        steps.push({ f: f, wrap: w, el: st, err: err, back: back, next: next });
+        form.appendChild(st);
       });
-      form.appendChild(fs);
     });
+    var head = el('div', 'skt-progress');
+    var bar = el('div', 'skt-progress-bar'); head.appendChild(bar);
+    var count = el('p', 'skt-progress-text');
+    form.insertBefore(count, form.firstChild);
+    form.insertBefore(head, form.firstChild);
+    var cur = 0;
+    var redo = el('button', 'skt-btn skt-redo', '条件を変える'); redo.type = 'button';
 
+    function visible() { return steps.filter(function (x) { return x.wrap.style.display !== 'none'; }); }
+    function stepOk(x) {
+      var f = x.f;
+      if (f.t === 'custom' && x.wrap._sktGet) {
+        var g = x.wrap._sktGet();
+        return g && g.ok ? '' : ((g && g.msg) || '入力してください。');
+      }
+      if (f.t === 'num' || f.t === 'man' || f.t === 'yen') return fieldValue(f, x.wrap) > 0 ? '' : '数字を入れてください。';
+      return '';
+    }
+    function go(i) {
+      var vs = visible();
+      if (i >= vs.length) { finish(); return; }
+      cur = Math.max(0, i);
+      steps.forEach(function (x) { x.el.hidden = x !== vs[cur]; x.err.hidden = true; });
+      vs[cur].back.style.visibility = cur === 0 ? 'hidden' : '';
+      vs[cur].next.textContent = cur === vs.length - 1 ? '結果を見る' : '次へ';
+      bar.style.width = Math.round(cur / vs.length * 100) + '%';
+      count.textContent = (cur + 1) + ' / ' + vs.length;
+      form.hidden = false; outWrap.hidden = true; app.classList.remove('is-done');
+      var t = root.getBoundingClientRect().top;
+      if (t < 0 || t > window.innerHeight * 0.5) root.scrollIntoView({ block: 'start', behavior: 'smooth' });
+      track('skt_step', { tool: name, step: cur + 1 });
+    }
+    function forward() {
+      var vs = visible(), x = vs[cur];
+      var m = stepOk(x);
+      if (m) { x.err.textContent = m; x.err.hidden = false; return; }
+      go(cur + 1);
+    }
+    function finish() {
+      recompute();
+      form.hidden = true; outWrap.hidden = false; app.classList.add('is-done');
+      var t = root.getBoundingClientRect().top;
+      if (t < 0 || t > window.innerHeight * 0.5) root.scrollIntoView({ block: 'start', behavior: 'smooth' });
+      track('skt_result', { tool: name });
+    }
+    steps.forEach(function (x) {
+      x.next.addEventListener('click', forward);
+      x.back.addEventListener('click', function () { go(cur - 1); });
+      if (x.f.t === 'tiles') {
+        // 選ぶだけの欄は、選んだら次へ（同じものを押し直しても進む）
+        Array.prototype.forEach.call(x.wrap.querySelectorAll('input[type=radio]'), function (r) {
+          var adv = function () { setTimeout(function () { if (visible()[cur] === x) forward(); }, 220); };
+          r.addEventListener('change', adv);
+          r.addEventListener('click', function () { if (r.checked) adv(); });
+        });
+      }
+      x.wrap.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' && e.target.tagName === 'INPUT') { e.preventDefault(); forward(); }
+      });
+    });
+    redo.addEventListener('click', function () { go(0); });
+
+    app.classList.add('is-wizard');
     app.appendChild(form);
     app.appendChild(outWrap);
+    outWrap.hidden = true;
 
     /* 操作ボタン */
     var acts = el('div', 'skt-actions');
@@ -565,6 +625,7 @@
         ta.remove();
       }
     });
+    acts.appendChild(redo);
     acts.appendChild(bPrint);
     acts.appendChild(bCopy);
     outWrap.appendChild(acts);
@@ -601,6 +662,7 @@
     root._sktRecompute = recompute;
 
     recompute();
+    go(0);
   }
 
   function boot() {

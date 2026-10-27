@@ -106,7 +106,7 @@
   /* ===================== 共通の欄：土地の単価 ===================== */
 
   var LAND = {
-    k: 'land', t: 'custom', label: '土地の単価',
+    k: 'land', t: 'custom', label: '土地の単価', q: '借地はどこにありますか？',
     build: function (wrap, id, onChange) {
       var st = { mode: CFG.api ? 'auto' : 'rosen', stats: null, busy: false, msg: '', where: '' };
 
@@ -272,12 +272,12 @@
   };
 
   var AREA = {
-    k: 'area', t: 'num', unit: '㎡', label: '土地の面積', def: 100, min: 0, max: 500, step: 1,
+    k: 'area', t: 'num', unit: '㎡', label: '土地の面積', q: '土地の広さはどのくらいですか？', def: 100, min: 0, max: 500, step: 1,
     hint: '登記簿や固定資産税の通知書に書かれた面積です。坪で分かる場合は、坪数×3.31で㎡になります。'
   };
 
   var RATIO = {
-    k: 'ratio', t: 'tiles', label: '借地権割合（路線価図のアルファベット）', def: 'x', cols: 4,
+    k: 'ratio', t: 'tiles', label: '借地権割合（路線価図のアルファベット）', q: '借地権割合はわかりますか？', def: 'x', cols: 4,
     opts: [
       { v: '0.9', l: 'A', s: '90%' }, { v: '0.8', l: 'B', s: '80%' }, { v: '0.7', l: 'C', s: '70%' },
       { v: '0.6', l: 'D', s: '60%' }, { v: '0.5', l: 'E', s: '50%' }, { v: '0.4', l: 'F', s: '40%' },
@@ -366,16 +366,16 @@
       { title: '土地', fields: [LAND, AREA] },
       { title: '借地の条件', fields: [
         RATIO,
-        { k: 'kind', t: 'tiles', label: '借地の種類', def: 'kyu', opts: [
+        { k: 'kind', t: 'tiles', label: '借地の種類', q: '借地はいつから続いていますか？', def: 'kyu', opts: [
           { v: 'kyu', l: '旧法', s: '1992年7月以前' }, { v: 'futsu', l: '普通借地権', s: '1992年8月以降' },
           { v: 'teiki', l: '定期借地権', s: '期限で終わる' }
         ], hint: '契約が1992年（平成4年）7月以前から続いていれば、更新していても旧法の借地権です。' },
-        { k: 'jinushi', t: 'tiles', label: '地主', def: 'tera', opts: [
+        { k: 'jinushi', t: 'tiles', label: '地主', q: '借地の地主はどなたですか？', def: 'tera', opts: [
           { v: 'tera', l: 'お寺・神社' }, { v: 'kojin', l: '個人' }, { v: 'hojin', l: '会社' }
         ] }
       ] },
       { title: '売り方', fields: [
-        { k: 'way', t: 'tiles', def: 'all', cols: 2, opts: [
+        { k: 'way', t: 'tiles', q: 'どの売り方の目安を見ますか？', def: 'all', cols: 2, opts: [
           { v: 'all', l: '3つを比べる' }, { v: 'jinushi', l: '地主に売る' },
           { v: 'third', l: '第三者に売る' }, { v: 'doji', l: '底地と一緒に売る' }
         ] }
@@ -426,7 +426,7 @@
 
       if (v.jinushi === 'tera') {
         r.flags.push({ level: 'info', title: '地主がお寺の場合',
-          text: '承諾や売買の判断は住職ひとりではなく、責任役員会で決めるのが原則です（宗教法人法18条）。回答までの期間に余裕を見てください。' });
+          text: '承諾や売買の判断は住職ひとりではなく、規則に別の定めがなければ責任役員の過半数で決めます（宗教法人法19条）。回答までの期間に余裕を見てください。' });
         if (v.way === 'all' || v.way === 'doji') {
           r.flags.push({ level: 'info', title: '底地と一緒に売るとき',
             text: 'お寺が底地を手放すには、少なくとも1か月前に信者などへ公告する手続きが必要です（宗教法人法23条）。' });
@@ -459,7 +459,7 @@
       { title: '土地', fields: [LAND, AREA] },
       { title: '借地の条件', fields: [
         RATIO,
-        { k: 'tokuyaku', t: 'tiles', label: '契約書に更新料の取り決めがありますか', def: 'yes', opts: [
+        { k: 'tokuyaku', t: 'tiles', label: '契約書に更新料の取り決めがありますか', q: '借地契約書に更新料の取り決めはありますか？', def: 'yes', opts: [
           { v: 'yes', l: 'ある' }, { v: 'no', l: 'ない' }, { v: 'unknown', l: '分からない' }
         ] }
       ] }
@@ -515,7 +515,7 @@
       { title: '土地', fields: [LAND, AREA] },
       { title: '承諾を求めること', fields: [
         RATIO,
-        { k: 'kind', t: 'tiles', label: '何の承諾ですか', def: 'jouto', cols: 2, opts: [
+        { k: 'kind', t: 'tiles', label: '何の承諾ですか', q: '地主に何の承諾を求めますか？', def: 'jouto', cols: 2, opts: [
           { v: 'jouto', l: '譲渡', s: '第三者に売る・名義を変える' }, { v: 'tatekae', l: '建て替え' },
           { v: 'zoukai', l: '増改築', s: 'リフォーム' }, { v: 'jouken', l: '借地条件の変更', s: '木造→鉄骨・RC' }
         ] }

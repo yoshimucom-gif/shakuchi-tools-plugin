@@ -426,3 +426,51 @@
   border-right: 2px solid var(--skt-brass); border-top: 2px solid var(--skt-brass); transform: rotate(45deg);
 }
 .skt-links a:hover { background: var(--skt-navy-l); }
+
+/* =========================================================================
+ * 1画面1問のステップ式（2026-10-27）
+ * 「見づらい・ぼんやりしている」と言われたので、文字を大きく、色を濃く、線をはっきりさせた。
+ * ======================================================================= */
+.skt-app.is-wizard { display: block; border: 1px solid var(--skt-rule); border-top: 4px solid var(--skt-navy); }
+.skt-app.is-wizard .skt-in { border: 0; padding: 26px 26px 24px; }
+.skt-progress { height: 6px; background: var(--skt-line-2); margin: 0 0 6px; }
+.skt-progress-bar { height: 100%; width: 0; background: var(--skt-navy); transition: width .3s ease; }
+.skt-progress-text { margin: 0 0 18px !important; text-align: right; font-size: 14px; font-weight: 800; color: var(--skt-navy); font-variant-numeric: tabular-nums; }
+.skt-step { animation: skt-in .22s ease; }
+@keyframes skt-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+.skt-q { font-size: clamp(20px, 2.6vw, 24px) !important; font-weight: 800; line-height: 1.45; color: var(--skt-ink); margin: 0 0 18px !important; padding: 0; border: 0; background: none; }
+.skt-step > .skt-field > .skt-label { display: none; }           /* 質問の見出しと同じことを2回出さない */
+.skt-step .skt-field { margin: 0; }
+.skt-step .skt-sublabel { font-size: 15px; font-weight: 700; color: var(--skt-ink); margin: 14px 0 6px; }
+.skt-step .skt-hint, .skt-step .skt-land-status { font-size: 14.5px; color: var(--skt-ink-2); line-height: 1.75; margin-top: 10px; }
+.skt-step .skt-land-status.is-warn { color: var(--skt-warn); }
+.skt-step .skt-sel select, .skt-step .skt-num input { font-size: 17px; padding-top: 13px; padding-bottom: 13px; border-color: #98a3ae; color: var(--skt-ink); }
+.skt-step .skt-num input { font-size: 22px; }
+.skt-step .skt-unit { font-size: 15px; color: var(--skt-ink); }
+.skt-step .skt-scale { font-size: 13px; color: var(--skt-ink-2); }
+.skt-step .skt-tiles { border-color: #98a3ae; gap: 0; }
+.skt-step .skt-tile span { font-size: 17px; font-weight: 700; color: var(--skt-ink); padding: 16px 10px; }
+.skt-step .skt-tile span small { font-size: 13.5px; font-weight: 500; color: var(--skt-ink-2); }
+.skt-step .skt-tile:hover span { background: var(--skt-navy-l); }
+.skt-step .skt-tile input:checked + span { background: var(--skt-navy); color: #fff; }
+.skt-step .skt-tile input:checked + span small { color: rgba(255,255,255,.85); }
+.skt-step-err { margin: 14px 0 0 !important; padding: 10px 14px; border-left: 3px solid var(--skt-ng); background: var(--skt-ng-l); color: var(--skt-ng); font-size: 15px; font-weight: 700; }
+.skt-step-nav { display: flex; justify-content: space-between; gap: 12px; margin-top: 24px; }
+.skt-step-nav .skt-btn { min-width: 130px; padding: 13px 22px; font-size: 16px; font-weight: 800; cursor: pointer; border: 1px solid var(--skt-navy); }
+.skt-step-nav .skt-back { background: #fff; color: var(--skt-navy); }
+.skt-step-nav .skt-next { background: var(--skt-navy); color: #fff; flex: 1; max-width: 320px; margin-left: auto; }
+.skt-step-nav .skt-next:hover { background: var(--skt-navy-d); }
+.skt-app.is-wizard .skt-out-wrap { position: static; padding: 28px 26px; background: #fff; }
+.skt-app.is-done .skt-hl-label { font-size: 15px; color: var(--skt-ink); }
+.skt-app.is-done .skt-hl-val b { font-size: clamp(34px, 7vw, 46px); color: var(--skt-navy); }
+.skt-app.is-done .skt-hl-sub, .skt-app.is-done .skt-out { font-size: 15px; color: var(--skt-ink-2); }
+.skt-redo { background: #fff; color: var(--skt-navy); border: 1px solid var(--skt-navy); font-weight: 800; }
+.skt-app.is-done .skt-cta { font-size: 17px; padding: 16px 20px; }
+@media (max-width: 600px) {
+  .skt-app.is-wizard .skt-in, .skt-app.is-wizard .skt-out-wrap { padding: 20px 16px; }
+  .skt-step-nav .skt-btn { min-width: 0; }
+  .skt-step-nav .skt-back { flex: 0 0 96px; }
+}
+@media (prefers-reduced-motion: reduce) { .skt-step { animation: none; } .skt-progress-bar { transition: none; } }
+.skt-step .skt-tile > span { border-bottom: 1px solid var(--skt-line); }
+.skt-step .skt-field[data-key="land"] > .skt-tiles .skt-tile > span { font-size: 15px; padding: 12px 6px; }
