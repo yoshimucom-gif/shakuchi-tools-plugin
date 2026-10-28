@@ -198,7 +198,7 @@
       }
 
       var reqSeq = 0;
-      function loadLand(district) {
+      function loadLand(district, fromPreset) {
         var code = city.sel.value;
         st.stats = null;
         if (!code) { setStatus(''); onChange(); return; }
@@ -210,12 +210,14 @@
           .then(function (res) {
             if (my !== reqSeq) return;
             st.busy = false;
-            if (!district) {
+            if (!district || fromPreset) {
               var ds = (res && res.districts) || [];
               fill(dist.sel, ds.map(function (d) { return [d[0], d[0] + '（' + d[1] + '件）']; }),
                 ds.length ? '町名を選ばない（市区町村全体）' : '地区の情報がありません');
             }
+            if (fromPreset && district) dist.sel.value = district;
             if (!res || !res.ok) {
+              if (fromPreset) reveal();
               setStatus((res && res.reason) || '取得できませんでした。路線価か坪単価を入れてください。', true);
             } else {
               st.stats = res;
@@ -228,12 +230,34 @@
           .catch(function () {
             if (my !== reqSeq) return;
             st.busy = false;
+            if (fromPreset) reveal();
             setStatus('取得できませんでした。路線価か坪単価を入れてください。', true);
             onChange();
           });
       }
 
-      if (CFG.api) {
+      /* 寺院の記事など、所在地が決まっているとき：その市区町村・町名で取得し、この質問は出さない。
+         取得できなかったときだけ質問に戻す（路線価・坪単価で入れられるように） */
+      var pre = (SKT._preset && SKT._preset.city && CFG.api) ? SKT._preset : null;
+      /* 外していた所在地の質問を戻し、ステップを最初から数え直させる */
+      function reveal() {
+        if (wrap.style.display !== 'none') return;
+        wrap.style.display = '';
+        var rt = wrap.closest('.skt');
+        if (rt) rt.dispatchEvent(new CustomEvent('skt-reflow'));
+      }
+      if (pre) {
+        wrap.style.display = 'none';
+        fill(pref.sel, CFG.prefs || [], null);
+        pref.sel.value = pre.city.slice(0, 2);
+        fill(city.sel, [], '読み込み中…');
+        getJSON('cities?pref=' + encodeURIComponent(pref.sel.value)).then(function (list) {
+          fill(city.sel, list || [], '市区町村を選ぶ');
+          city.sel.value = pre.city;
+          if (city.sel.value !== pre.city) { reveal(); return; }
+          loadLand(pre.district || '', true);
+        }).catch(function () { reveal(); });
+      } else if (CFG.api) {
         fill(pref.sel, CFG.prefs || [], null);
         pref.sel.value = '13';
         loadCities();
@@ -431,13 +455,13 @@
     },
     handoff: function (v, r) {
       var b = base(v);
-      if (b.err) return { youken: '借地権の売却価格査定', lines: [] };
+      if (b.err) return { youken: '借地権を売りたい', lines: [] };
       var lines = landLines(v, b);
       lines.push('借地の種類：' + (KIND[v.kind] || ''));
       lines.push('地主：' + (JINUSHI[v.jinushi] || ''));
       if (r.headline) lines.push(r.headline.label + '：' + r.headline.value);
       if (r.table) r.table.rows.forEach(function (x) { lines.push('　' + x[0] + '：' + x[1]); });
-      return { youken: '借地権の売却価格査定', lines: lines };
+      return { youken: '借地権を売りたい', lines: lines };
     }
   };
 
@@ -483,11 +507,11 @@
     },
     handoff: function (v, r) {
       var b = base(v);
-      if (b.err) return { youken: '更新料の相談', lines: [] };
+      if (b.err) return { youken: '更新料・地代のこと', lines: [] };
       var lines = landLines(v, b);
       lines.push('更新料の取り決め：' + ({ yes: 'ある', no: 'ない', unknown: '分からない' }[v.tokuyaku] || ''));
       if (r.headline) lines.push(r.headline.label + '：' + r.headline.value);
-      return { youken: '更新料の相談', lines: lines };
+      return { youken: '更新料・地代のこと', lines: lines };
     }
   };
 
@@ -534,11 +558,11 @@
     handoff: function (v, r) {
       var b = base(v);
       var s = SHOUDAKU[v.kind] || SHOUDAKU.jouto;
-      if (b.err) return { youken: 'その他', lines: [] };
+      if (b.err) return { youken: v.kind === 'jouto' ? '借地権を売りたい' : '建て替え・承諾料のこと', lines: [] };
       var lines = landLines(v, b);
       lines.push('承諾の内容：' + s.l);
       if (r.headline) lines.push(r.headline.label + '：' + r.headline.value);
-      return { youken: v.kind === 'jouto' ? '借地権の売却価格査定' : 'その他', lines: lines };
+      return { youken: v.kind === 'jouto' ? '借地権を売りたい' : '建て替え・承諾料のこと', lines: lines };
     }
   };
 })();

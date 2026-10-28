@@ -493,6 +493,10 @@
 
     var fields = [];
     var groups = tool.groups || [{ fields: tool.fields }];
+    /* 最初から決まっている条件（ショートコードの city / district / jinushi / tera）。欄を組み立てる間だけ SKT._preset に置く */
+    var preset = {};
+    try { preset = root.dataset.preset ? JSON.parse(root.dataset.preset) : {}; } catch (e) { preset = {}; }
+    SKT._preset = preset;
 
     function recompute() {
       var v = {};
@@ -546,6 +550,13 @@
         form.appendChild(st);
       });
     });
+    SKT._preset = null;
+    /* 決まっている選択肢は選んだ状態にして、質問から外す（土地の欄はツール側が自分で外す） */
+    steps.forEach(function (x) {
+      if (x.f.t !== 'tiles' || !preset[x.f.k]) return;
+      var r = x.wrap.querySelector('input[value="' + String(preset[x.f.k]).replace(/"/g, '') + '"]');
+      if (r) { r.checked = true; x.wrap.style.display = 'none'; }
+    });
     var head = el('div', 'skt-progress');
     var bar = el('div', 'skt-progress-bar'); head.appendChild(bar);
     var count = el('p', 'skt-progress-text');
@@ -591,6 +602,7 @@
       if (t < 0 || t > window.innerHeight * 0.5) root.scrollIntoView({ block: 'start', behavior: 'smooth' });
       track('skt_result', { tool: name });
     }
+    root.addEventListener('skt-reflow', function () { go(0); });
     steps.forEach(function (x) {
       x.next.addEventListener('click', forward);
       x.back.addEventListener('click', function () { go(cur - 1); });
@@ -655,7 +667,7 @@
           var h = tool.handoff(root._sktValues || {}, root._sktResult || {}, SKT) || {};
           var lines = [tool.title + 'で計算した条件'].concat(h.lines || []);
           sessionStorage.setItem('skt_handoff', JSON.stringify({
-            text: lines.join('\n'), youken: h.youken || '', tera: h.tera || '', at: Date.now()
+            text: lines.join('\n'), youken: h.youken || '', tera: h.tera || preset.tera || '', at: Date.now()
           }));
         } catch (e) { /* 保存できない環境では引き継がないだけ */ }
       });

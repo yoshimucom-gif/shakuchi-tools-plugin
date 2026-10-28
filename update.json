@@ -1,6 +1,6 @@
 {
   "name": "借地権の計算ツール",
-  "version": "1.1.6",
+  "version": "1.1.7",
   "download_url": "https://raw.githubusercontent.com/yoshimucom-gif/shakuchi-tools-plugin/main/shakuchi-tools.zip",
   "requires": "5.8",
   "tested": "6.7",
@@ -8,6 +8,6 @@
   "author": "ミカタ株式会社",
   "homepage": "https://github.com/yoshimucom-gif/shakuchi-tools-plugin",
   "sections": {
-    "changelog": "1.1.6\n国交省の取引データから、関係者間取引・隣地の購入・調停・競売等など特殊な事情の取引を外して土地の単価を出すように変更。金額を保証しない旨の注意に、地主の考え方で金額が大きく変わることを追記"
+    "changelog": "1.1.7\n寺院の記事など所在地と地主が決まっているページでは、その質問を出さない（ショートコードに city・district・jinushi・tera）。所在地が取れないときだけ質問に戻す。相談フォームの新しい「ご相談の内容」に引き継ぐ"
   }
 }

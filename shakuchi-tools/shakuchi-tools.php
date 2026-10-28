@@ -2,7 +2,7 @@
 /**
  * Plugin Name: 借地権の計算ツール
  * Description: 借地権の売却相場・更新料・承諾料の目安を、ショートコード1本でページに置けます。土地の単価は国交省「不動産情報ライブラリ」の土地の取引事例から自動で取得できます（APIキーを設定した場合）。計算はブラウザ内で行い、入力値は保存しません。
- * Version: 1.1.6
+ * Version: 1.1.7
  * Author: ミカタ株式会社
  * License: GPLv2 or later
  * Text Domain: shakuchi-tools
@@ -25,7 +25,7 @@
 
 if (!defined('ABSPATH')) exit;
 
-define('SKT_VER', '1.1.6');
+define('SKT_VER', '1.1.7');
 define('SKT_OPT', 'skt_options');
 define('SKT_DIR', plugin_dir_path(__FILE__));
 define('SKT_URL', plugin_dir_url(__FILE__));
@@ -428,6 +428,9 @@ function skt_voice_html($slug) {
 function skt_shortcode_tool($atts) {
     $a = shortcode_atts(array(
         'name' => '', 'title' => '', 'desc' => 'on', 'head' => 'on', 'cta' => 'on',
+        /* 最初から決まっている条件（寺院の記事など）。入れた欄は質問しない（2026-10-28 吉村さん「ピンポイントでお寺の記事に流入してるのに、これいる？」）
+           city=市区町村コード5桁 district=町名（国交省データの地区名）jinushi=tera|kojin|hojin tera=お寺の名前（相談フォームへ引き継ぐ） */
+        'city' => '', 'district' => '', 'jinushi' => '', 'tera' => '',
     ), $atts, 'shakuchi_tool');
 
     $slug  = sanitize_key($a['name']);
@@ -439,7 +442,13 @@ function skt_shortcode_tool($atts) {
     skt_enqueue();
 
     $style = skt_accent_style();
-    $out  = '<div class="skt" data-tool="' . esc_attr($slug) . '"' . ($style ? ' style="' . esc_attr($style) . '"' : '') . '>';
+    $preset = array();
+    if (preg_match('/^\d{5}$/', $a['city'])) $preset['city'] = $a['city'];
+    if ($a['district'] !== '') $preset['district'] = sanitize_text_field($a['district']);
+    if (in_array($a['jinushi'], array('tera', 'kojin', 'hojin'), true)) $preset['jinushi'] = $a['jinushi'];
+    if ($a['tera'] !== '') $preset['tera'] = sanitize_text_field($a['tera']);
+    $out  = '<div class="skt" data-tool="' . esc_attr($slug) . '"' . ($style ? ' style="' . esc_attr($style) . '"' : '')
+          . ($preset ? " data-preset='" . esc_attr(wp_json_encode($preset)) . "'" : '') . '>';
 
     if ($a['head'] !== 'off') {
         $out .= '<div class="skt-head">';
