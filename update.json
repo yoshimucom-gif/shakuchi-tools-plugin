@@ -1,6 +1,6 @@
 {
   "name": "借地権の計算ツール",
-  "version": "1.1.7",
+  "version": "1.1.8",
   "download_url": "https://raw.githubusercontent.com/yoshimucom-gif/shakuchi-tools-plugin/main/shakuchi-tools.zip",
   "requires": "5.8",
   "tested": "6.7",
@@ -8,6 +8,6 @@
   "author": "ミカタ株式会社",
   "homepage": "https://github.com/yoshimucom-gif/shakuchi-tools-plugin",
   "sections": {
-    "changelog": "1.1.7\n寺院の記事など所在地と地主が決まっているページでは、その質問を出さない（ショートコードに city・district・jinushi・tera）。所在地が取れないときだけ質問に戻す。相談フォームの新しい「ご相談の内容」に引き継ぐ"
+    "changelog": "1.1.8\n相談フォームの「ご相談の内容」がプルダウンでも、計算ツールの条件を引き継ぐように"
   }
 }

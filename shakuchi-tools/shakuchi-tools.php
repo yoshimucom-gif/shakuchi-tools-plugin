@@ -2,7 +2,7 @@
 /**
  * Plugin Name: 借地権の計算ツール
  * Description: 借地権の売却相場・更新料・承諾料の目安を、ショートコード1本でページに置けます。土地の単価は国交省「不動産情報ライブラリ」の土地の取引事例から自動で取得できます（APIキーを設定した場合）。計算はブラウザ内で行い、入力値は保存しません。
- * Version: 1.1.7
+ * Version: 1.1.8
  * Author: ミカタ株式会社
  * License: GPLv2 or later
  * Text Domain: shakuchi-tools
@@ -25,7 +25,7 @@
 
 if (!defined('ABSPATH')) exit;
 
-define('SKT_VER', '1.1.7');
+define('SKT_VER', '1.1.8');
 define('SKT_OPT', 'skt_options');
 define('SKT_DIR', plugin_dir_path(__FILE__));
 define('SKT_URL', plugin_dir_url(__FILE__));
@@ -345,13 +345,15 @@ function skt_handoff_script() {
     $o = skt_opt();
     if ($o['handoff'] !== '1') return;
     $cfg = wp_json_encode(array('m' => $o['f_message'], 'y' => $o['f_youken'], 't' => $o['f_tera']));
+    // 用件の欄はラジオでもプルダウンでも選ぶ（借地権のミカタの相談フォームは 2026-10-29 にプルダウンへ変えた）
     ?>
 <script>
 (function(){try{var raw=sessionStorage.getItem('skt_handoff');if(!raw)return;var c=<?php echo $cfg; ?>;
 var d=JSON.parse(raw);if(!d||!d.text||Date.now()-(d.at||0)>3600000){sessionStorage.removeItem('skt_handoff');return;}
 function go(){var m=c.m&&document.querySelector('textarea[name="'+c.m+'"]');if(!m)return;
 if(!m.value){m.value=d.text+'\n\n';m.dispatchEvent(new Event('input',{bubbles:true}));}
-if(c.y&&d.youken){var r=document.querySelector('input[name="'+c.y+'"][value="'+d.youken.replace(/"/g,'')+'"]');if(r){r.checked=true;r.dispatchEvent(new Event('change',{bubbles:true}));}}
+if(c.y&&d.youken){var yv=d.youken.replace(/"/g,'');var r=document.querySelector('input[name="'+c.y+'"][value="'+yv+'"]');if(r){r.checked=true;r.dispatchEvent(new Event('change',{bubbles:true}));}
+else{var s=document.querySelector('select[name="'+c.y+'"]');if(s&&s.querySelector('option[value="'+yv+'"]')){s.value=yv;s.dispatchEvent(new Event('change',{bubbles:true}));}}}
 if(c.t&&d.tera){var t=document.querySelector('input[name="'+c.t+'"]');if(t&&!t.value)t.value=d.tera;}
 sessionStorage.removeItem('skt_handoff');}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',go);else go();}catch(e){}})();
