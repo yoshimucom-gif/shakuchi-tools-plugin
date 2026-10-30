@@ -575,7 +575,9 @@
       if (f.t === 'num' || f.t === 'man' || f.t === 'yen') return fieldValue(f, x.wrap) > 0 ? '' : '数字を入れてください。';
       return '';
     }
-    function go(i) {
+    /* quiet＝ページを開いたときなど、読者が操作していないとき。画面をツールまでスクロールしない
+       （2026-10-30 吉村さん「どのリンクもそう」。開いた瞬間にツールまで飛んでいた） */
+    function go(i, quiet) {
       var vs = visible();
       if (i >= vs.length) { finish(); return; }
       cur = Math.max(0, i);
@@ -586,7 +588,7 @@
       count.textContent = (cur + 1) + ' / ' + vs.length;
       form.hidden = false; outWrap.hidden = true; app.classList.remove('is-done');
       var t = root.getBoundingClientRect().top;
-      if (t < 0 || t > window.innerHeight * 0.5) root.scrollIntoView({ block: 'start', behavior: 'smooth' });
+      if (!quiet && (t < 0 || t > window.innerHeight * 0.5)) root.scrollIntoView({ block: 'start', behavior: 'smooth' });
       track('skt_step', { tool: name, step: cur + 1 });
     }
     function forward() {
@@ -602,7 +604,7 @@
       if (t < 0 || t > window.innerHeight * 0.5) root.scrollIntoView({ block: 'start', behavior: 'smooth' });
       track('skt_result', { tool: name });
     }
-    root.addEventListener('skt-reflow', function () { go(0); });
+    root.addEventListener('skt-reflow', function () { go(0, true); });
     steps.forEach(function (x) {
       x.next.addEventListener('click', forward);
       x.back.addEventListener('click', function () { go(cur - 1); });
@@ -686,7 +688,7 @@
     root._sktRecompute = recompute;
 
     recompute();
-    go(0);
+    go(0, true);
   }
 
   function boot() {
