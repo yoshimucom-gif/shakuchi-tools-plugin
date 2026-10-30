@@ -466,7 +466,10 @@
 .skt-step .skt-tile input:checked + span { background: var(--skt-navy); color: #fff; }
 .skt-step .skt-tile input:checked + span small { color: rgba(255,255,255,.85); }
 .skt-step-err { margin: 14px 0 0 !important; padding: 10px 14px; border-left: 3px solid var(--skt-ng); background: var(--skt-ng-l); color: var(--skt-ng); font-size: 15px; font-weight: 700; }
-.skt-step-nav { display: flex; justify-content: space-between; gap: 12px; margin-top: 24px; }
+/* どのステップも同じ高さ（JSで一番高いステップに合わせる）。ボタンは下端にそろえて、進むたびに位置が動かないようにする
+   （2026-10-30 吉村さん「入れるたびに高さがずれるのが地味にストレス」） */
+.skt-step:not([hidden]) { display: flex; flex-direction: column; }
+.skt-step-nav { display: flex; justify-content: space-between; gap: 12px; margin-top: auto; padding-top: 24px; }
 .skt-step-nav .skt-btn { min-width: 130px; padding: 13px 22px; font-size: 16px; font-weight: 800; cursor: pointer; border: 1px solid var(--skt-navy); }
 .skt-step-nav .skt-back { background: #fff; color: var(--skt-navy); }
 .skt-step-nav .skt-next { background: var(--skt-navy); color: #fff; flex: 1; max-width: 320px; margin-left: auto; }
@@ -521,3 +524,39 @@
 .skt-voice.is-plain .dbp-voice-icon-img { width: 64px; height: 64px; border-radius: 50%; object-fit: cover; }
 .skt-voice.is-plain .dbp-voice-text { flex: 1; padding: 12px 16px; background: var(--skt-navy-l); border-radius: 8px; font-size: 14px; line-height: 1.8; }
 .skt-voice.is-plain .dbp-voice-text p { margin: 0; }
+
+/* ---------- 計算機の見た目（2026-10-30 吉村さん「見出しと一緒の色を使わないでほしい。もっと計算ツールっぽく」） ----------
+   本体＝濃いグレーの筐体（角丸と下の厚み）、数字の欄と結果＝液晶の表示、選択肢とボタン＝押せるキー。
+   色はサイトの見出し（紺）と分ける：筐体 #2f3437／液晶 #e4edd6／差し色は相談ボタンと同じ橙（設定の「差し色」） */
+.skt-app.is-wizard { border: 0; border-radius: 16px; background: #2f3437; padding: 10px; box-shadow: 0 6px 0 #1d2124; }
+.skt-app.is-wizard .skt-in { border: 0; border-radius: 10px; background: #eceff1; }
+.skt-app.is-wizard .skt-out-wrap { border-radius: 10px; }
+.skt-progress { height: 8px; border-radius: 4px; background: #d5dade; overflow: hidden; }
+.skt-progress-bar { background: var(--skt-brass); border-radius: 4px; }
+.skt-progress-text { display: inline-block; float: right; margin: 8px 0 14px !important; padding: 2px 10px; border-radius: 4px;
+  background: #e4edd6; color: #1e2b1a; font-family: "Roboto Mono", Consolas, monospace; box-shadow: inset 0 1px 3px rgba(0,0,0,.25); }
+.skt-step .skt-q { clear: both; }
+/* 数字の欄は液晶 */
+.skt-step .skt-num input { background: #e4edd6 !important; color: #1e2b1a; font-family: "Roboto Mono", Consolas, monospace; font-weight: 800;
+  border: 0 !important; border-radius: 8px 0 0 8px; box-shadow: inset 0 2px 4px rgba(0,0,0,.25); }
+.skt-step .skt-num .skt-unit { border: 0 !important; border-radius: 0 8px 8px 0; background: #cfd9bf !important; color: #1e2b1a;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,.18); }
+.skt-step .skt-sel select { border-radius: 8px; border: 1px solid #b8c0c6; border-bottom-width: 3px; }
+/* 選択肢はキー */
+.skt-step .skt-tiles { gap: 8px; background: transparent; border: 0; }
+.skt-step .skt-tile > span { border: 1px solid #c3cad0 !important; border-bottom: 4px solid #c3cad0 !important; border-radius: 8px;
+  transition: transform .06s, border-bottom-width .06s; }
+.skt-step .skt-tile:hover > span { background: #f7f8f9; }
+.skt-step .skt-tile:active > span { transform: translateY(2px); border-bottom-width: 2px !important; }
+.skt-step .skt-tile input:checked + span { background: #2f3437; color: #fff; border-color: #1d2124 !important; }
+/* 戻る・次へ・条件を変える・コピーもキー */
+.skt-step-nav .skt-btn, .skt-app.is-wizard .skt-actions .skt-btn { border-radius: 8px; transition: transform .06s, border-bottom-width .06s; }
+.skt-step-nav .skt-back { background: #fff; color: #2f3437; border: 1px solid #c3cad0; border-bottom: 4px solid #c3cad0; }
+.skt-step-nav .skt-next { background: #2f3437; color: #fff; border: 1px solid #1d2124; border-bottom: 4px solid #1d2124; }
+.skt-step-nav .skt-next:hover { background: #3b4246; }
+.skt-step-nav .skt-btn:active { transform: translateY(2px); border-bottom-width: 2px; }
+.skt-app.is-wizard .skt-actions { border: 0; gap: 8px; }
+.skt-app.is-wizard .skt-actions .skt-btn { background: #fff; color: #2f3437; border: 1px solid #c3cad0; border-bottom: 3px solid #c3cad0; }
+/* 結果の金額は液晶の表示 */
+.skt-app.is-done .skt-hl-val { background: #e4edd6; border-radius: 10px; padding: 12px 16px; box-shadow: inset 0 2px 5px rgba(0,0,0,.25); }
+.skt-app.is-done .skt-hl-val b { color: #1e2b1a; font-family: "Roboto Mono", Consolas, monospace; letter-spacing: -.01em; }

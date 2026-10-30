@@ -575,6 +575,32 @@
       if (f.t === 'num' || f.t === 'man' || f.t === 'yen') return fieldValue(f, x.wrap) > 0 ? '' : '数字を入れてください。';
       return '';
     }
+    /* 出ているステップを全部いったん表示して高さを測り、一番高いものに全ステップをそろえる。
+       ステップごとに高さが違うと、進むたびに下の文章とボタンの位置がずれる（2026-10-30 吉村さん）。
+       欄の出し分け・土地の取得結果・画面幅で高さが変わるので、切り替えのたびと画面幅が変わったときに測り直す */
+    function equalize() {
+      var vs = visible(), max = 0;
+      steps.forEach(function (x) { x.el.style.minHeight = ''; });
+      vs.forEach(function (x) {
+        var was = x.el.hidden, e = x.err.hidden;
+        x.el.hidden = false; x.err.hidden = true;
+        max = Math.max(max, x.el.offsetHeight);
+        x.el.hidden = was; x.err.hidden = e;
+      });
+      if (max) vs.forEach(function (x) { x.el.style.minHeight = max + 'px'; });
+    }
+    /* 表示中のステップがあとから伸びたとき（土地の取得結果の文が出たときなど）も、ほかのステップをそろえ直す */
+    if (window.ResizeObserver) {
+      new ResizeObserver(function () {
+        var c = visible()[cur];
+        if (!form.hidden && c && c.el.offsetHeight > (parseFloat(c.el.style.minHeight) || 0) + 1) equalize();
+      }).observe(form);
+    }
+    var rz;
+    window.addEventListener('resize', function () {
+      clearTimeout(rz);
+      rz = setTimeout(function () { if (!form.hidden) equalize(); }, 150);
+    });
     /* quiet＝ページを開いたときなど、読者が操作していないとき。画面をツールまでスクロールしない
        （2026-10-30 吉村さん「どのリンクもそう」。開いた瞬間にツールまで飛んでいた） */
     function go(i, quiet) {
@@ -587,6 +613,7 @@
       bar.style.width = Math.round(cur / vs.length * 100) + '%';
       count.textContent = (cur + 1) + ' / ' + vs.length;
       form.hidden = false; outWrap.hidden = true; app.classList.remove('is-done');
+      equalize();
       var t = root.getBoundingClientRect().top;
       if (!quiet && (t < 0 || t > window.innerHeight * 0.5)) root.scrollIntoView({ block: 'start', behavior: 'smooth' });
       track('skt_step', { tool: name, step: cur + 1 });
