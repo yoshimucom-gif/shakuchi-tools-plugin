@@ -2,7 +2,7 @@
 /**
  * Plugin Name: 借地権の計算ツール
  * Description: 借地権の売却相場・更新料・承諾料の目安を、ショートコード1本でページに置けます。土地の単価は国交省「不動産情報ライブラリ」の土地の取引事例から自動で取得できます（APIキーを設定した場合）。計算はブラウザ内で行い、入力値は保存しません。
- * Version: 1.1.11
+ * Version: 1.1.12
  * Author: ミカタ株式会社
  * License: GPLv2 or later
  * Text Domain: shakuchi-tools
@@ -25,7 +25,7 @@
 
 if (!defined('ABSPATH')) exit;
 
-define('SKT_VER', '1.1.11');
+define('SKT_VER', '1.1.12');
 define('SKT_OPT', 'skt_options');
 define('SKT_DIR', plugin_dir_path(__FILE__));
 define('SKT_URL', plugin_dir_url(__FILE__));
@@ -49,7 +49,7 @@ require_once __DIR__ . '/includes/tools-data.php';
 
 function skt_defaults() {
     return array(
-        'accent'      => '#2F3437',   // 計算機の筐体のグレー（サイトの見出しの紺と分ける。2026-10-30）
+        'accent'      => '#26303A',   // 文字・選んだ状態の濃い色（サイトの見出しの紺と分ける。2026-10-30）
         'brass'       => '#E8730C',   // 差し色＝相談ボタンと同じ橙
         'api_key'     => '',
         'cta_url'     => '',
