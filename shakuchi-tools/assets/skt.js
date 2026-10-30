@@ -629,9 +629,7 @@
 
     /* 操作ボタン */
     var acts = el('div', 'skt-actions');
-    var bPrint = el('button', 'skt-btn', '印刷する');
-    bPrint.type = 'button';
-    bPrint.addEventListener('click', function () { window.print(); });
+    /* 「印刷する」は使い道が伝わらないので置かない（2026-10-30 吉村さん「印刷するの意味わからんから消して」） */
     var bCopy = el('button', 'skt-btn', '結果をコピー');
     bCopy.type = 'button';
     bCopy.addEventListener('click', function () {
@@ -648,7 +646,6 @@
       }
     });
     acts.appendChild(redo);
-    acts.appendChild(bPrint);
     acts.appendChild(bCopy);
     outWrap.appendChild(acts);
 

@@ -2,7 +2,7 @@
 /**
  * Plugin Name: 借地権の計算ツール
  * Description: 借地権の売却相場・更新料・承諾料の目安を、ショートコード1本でページに置けます。土地の単価は国交省「不動産情報ライブラリ」の土地の取引事例から自動で取得できます（APIキーを設定した場合）。計算はブラウザ内で行い、入力値は保存しません。
- * Version: 1.1.9
+ * Version: 1.1.10
  * Author: ミカタ株式会社
  * License: GPLv2 or later
  * Text Domain: shakuchi-tools
@@ -25,7 +25,7 @@
 
 if (!defined('ABSPATH')) exit;
 
-define('SKT_VER', '1.1.9');
+define('SKT_VER', '1.1.10');
 define('SKT_OPT', 'skt_options');
 define('SKT_DIR', plugin_dir_path(__FILE__));
 define('SKT_URL', plugin_dir_url(__FILE__));
@@ -59,9 +59,10 @@ function skt_defaults() {
         /* 結果の下（ボタンの上）に出す監修者の一言。Re:Diver のボイス（dbp/voice）で出す。画像が空なら出さない */
         'voice_img'   => '',
         'voice_name'  => '',
-        'voice_baikyaku' => '借地は、地主や借地契約の内容によって売れる金額が大きく変わります。まずはこの目安を手元に置いて、どの売り方が合うかを一緒に整理しましょう。',
-        'voice_koushin'  => '更新料は、地主や借地契約の内容によって大きく変わります。まずは地主から示された額が、目安から大きく外れていないかを一緒に確かめましょう。',
-        'voice_shoudaku' => '承諾料は、地主や借地契約の内容によって大きく変わります。まずは地主に話を切り出す前に、伝える条件を一緒に整理しましょう。',
+        // 短い呼びかけに読点を打たない（2026-10-30 吉村さん「、のうちかたがAIっぽい」）
+        'voice_baikyaku' => '借地は地主や借地契約の内容によって売れる金額が大きく変わります。まずはこの目安を手元に置いてどの売り方が合うかを一緒に整理しましょう。',
+        'voice_koushin'  => '更新料は地主や借地契約の内容によって大きく変わります。地主から示された額が目安から大きく外れていないかをまずは一緒に確かめましょう。',
+        'voice_shoudaku' => '承諾料は地主や借地契約の内容によって大きく変わります。地主に話を切り出す前に伝える条件をまずは一緒に整理しましょう。',
         'handoff'     => '1',
         'f_message'   => 'your-message',
         'f_youken'    => 'youken',

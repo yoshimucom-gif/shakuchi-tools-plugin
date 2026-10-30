@@ -318,14 +318,25 @@
 .skt-btn:focus-visible { outline: 2px solid var(--skt-navy); outline-offset: -2px; }
 .skt-btn.is-done { background: var(--skt-ok-l); color: var(--skt-ok); }
 
-/* CTA（サイトのヘッダーCTAと同じ真鍮・角丸2px） */
+/* CTA。見出しの色と分けて橙の立体ボタンにし、3秒に1回だけ小さく跳ねる
+   （2026-10-30 吉村さん「結果のボタンわかりにくいなー見出しみたい」→ ③立体＋跳ねる） */
 .skt-cta {
   display: block; margin-top: 18px; padding: 14px 20px; text-align: center;
-  background: var(--skt-brass); color: #fff !important; text-decoration: none !important;
-  border-radius: 2px; font-weight: 800; font-size: 15px; line-height: 1.5;
-  transition: background .12s;
+  background: #e8730c; color: #fff !important; text-decoration: none !important;
+  border-bottom: 5px solid #a84f04; border-radius: 6px;
+  font-weight: 800; font-size: 15px; line-height: 1.5;
+  transition: background .12s, transform .08s, border-bottom-width .08s;
+  animation: skt-cta-bounce 3s ease-in-out infinite;
 }
-.skt-cta:hover { background: #a98a4d; }
+.skt-cta:hover { background: #f07d17; animation: none; }   /* 跳ねを止めて、押したときの沈み込みを効かせる */
+.skt-cta:active { transform: translateY(3px); border-bottom-width: 2px; }
+@keyframes skt-cta-bounce {
+  0%, 80%, 100% { transform: translateY(0); }
+  86% { transform: translateY(-5px); }
+  92% { transform: translateY(0); }
+  96% { transform: translateY(-2px); }
+}
+@media (prefers-reduced-motion: reduce) { .skt-cta { animation: none; } }
 .skt-cta small { display: block; font-size: 12px; font-weight: 500; opacity: .9; margin-top: 3px; }
 
 /* 解説 */
