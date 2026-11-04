@@ -574,3 +574,9 @@
 @media (max-width: 600px) {
   .skt-app.is-wizard .skt-in { padding: 22px 18px 24px; }
 }
+
+/* 金額のすぐ下の相談リンク（2026-11-04） */
+.skt-hl-cta { display: inline-block; margin-top: 10px; font-size: 15px; font-weight: 700; color: var(--skt-brass) !important;
+  text-decoration: underline !important; text-underline-offset: 3px; }
+.skt-hl-cta::after { content: " →"; }
+.skt-hl-cta:hover { color: #c2560a !important; }

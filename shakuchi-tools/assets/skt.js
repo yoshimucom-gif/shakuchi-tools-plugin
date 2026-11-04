@@ -525,6 +525,16 @@
       }
       root._sktResult = r;
       renderResult(out, r);
+      /* 金額のすぐ下にも、相談へのテキストリンク（2026-11-04 吉村さん「ボタンだけど、金額の下にあってもいい気がする。テキストリンクでもいい」）。
+         押したときの引き継ぎは下のボタンと同じ */
+      var hlSub = out.querySelector('.skt-hl-sub') || out.querySelector('.skt-hl-val');
+      var ctaEl = root.querySelector('[data-cta]');
+      if (hlSub && ctaEl) {
+        var tl = el('a', 'skt-hl-cta', 'この金額について無料で相談する');
+        tl.href = ctaEl.getAttribute('href');
+        tl.addEventListener('click', function () { handoff('text'); });
+        hlSub.parentNode.insertBefore(tl, hlSub.nextSibling);
+      }
     }
 
     /* ---------- 1画面1問のステップ式（2026-10-27） ----------
@@ -682,21 +692,23 @@
     var voice = root.querySelector('[data-voice]');
     if (voice) outWrap.appendChild(voice);
 
+    /* 相談へ進むとき：入力した条件の要約を相談フォームへ引き継ぐ（金額の下のテキストリンクと下のボタンで共通） */
+    function handoff(from) {
+      track('skt_cta_click', { tool: name, from: from });
+      var cfg = window.SKT_CFG || {};
+      if (!cfg.handoff || !tool.handoff) return;
+      try {
+        var h = tool.handoff(root._sktValues || {}, root._sktResult || {}, SKT) || {};
+        var lines = [tool.title + 'で計算した条件'].concat(h.lines || []);
+        sessionStorage.setItem('skt_handoff', JSON.stringify({
+          text: lines.join('\n'), youken: h.youken || '', tera: h.tera || preset.tera || '', at: Date.now()
+        }));
+      } catch (e) { /* 保存できない環境では引き継がないだけ */ }
+    }
     var cta = root.querySelector('[data-cta]');
     if (cta) {
       outWrap.appendChild(cta);
-      cta.addEventListener('click', function () {
-        track('skt_cta_click', { tool: name });
-        var cfg = window.SKT_CFG || {};
-        if (!cfg.handoff || !tool.handoff) return;
-        try {
-          var h = tool.handoff(root._sktValues || {}, root._sktResult || {}, SKT) || {};
-          var lines = [tool.title + 'で計算した条件'].concat(h.lines || []);
-          sessionStorage.setItem('skt_handoff', JSON.stringify({
-            text: lines.join('\n'), youken: h.youken || '', tera: h.tera || preset.tera || '', at: Date.now()
-          }));
-        } catch (e) { /* 保存できない環境では引き継がないだけ */ }
-      });
+      cta.addEventListener('click', function () { handoff('button'); });
     }
 
     var ns = root.querySelector('.skt-noscript');
