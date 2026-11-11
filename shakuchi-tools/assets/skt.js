@@ -530,7 +530,11 @@
       var hlSub = out.querySelector('.skt-hl-sub') || out.querySelector('.skt-hl-val');
       var ctaEl = root.querySelector('[data-cta]');
       if (hlSub && ctaEl) {
-        var tl = el('a', 'skt-hl-cta', 'この金額について無料で相談する');
+        /* テキストリンクだと橙の枠に埋もれたので、サイトの相談ボタンと同じ札つきボタンに（2026-11-11 吉村さん「ボタンにするとかさ」→ B） */
+        var tl = el('a', 'skt-hl-cta');
+        tl.innerHTML = '<span class="skt-hl-cta__tag">無料</span>'
+          + '<span class="skt-hl-cta__main"><small>＼ 相談だけでもOKです ／</small><strong>この金額について相談する</strong></span>'
+          + '<span class="skt-hl-cta__ar" aria-hidden="true">›</span>';
         tl.href = ctaEl.getAttribute('href');
         tl.addEventListener('click', function () { handoff('text'); });
         hlSub.parentNode.insertBefore(tl, hlSub.nextSibling);

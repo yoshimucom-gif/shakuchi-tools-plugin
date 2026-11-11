@@ -1,6 +1,6 @@
 {
   "name": "借地権の計算ツール",
-  "version": "1.1.15",
+  "version": "1.1.16",
   "download_url": "https://raw.githubusercontent.com/yoshimucom-gif/shakuchi-tools-plugin/main/shakuchi-tools.zip",
   "requires": "5.8",
   "tested": "6.7",
@@ -8,6 +8,6 @@
   "author": "ミカタ株式会社",
   "homepage": "https://github.com/yoshimucom-gif/shakuchi-tools-plugin",
   "sections": {
-    "changelog": "1.1.15\n計算ツールの解説文の段落を1文ずつに分けて読みやすく"
+    "changelog": "1.1.16\n結果の金額の下の相談リンクを、紺の札つきボタン（橙の矢印つき）に変更"
   }
 }
